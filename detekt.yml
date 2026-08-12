@@ -1,0 +1,28 @@
+complexity:
+  LongMethod:
+    active: true
+  LargeClass:
+    active: true
+  TooManyFunctions:
+    active: true
+  LongParameterList:
+    active: true
+  CyclomaticComplexMethod:
+    active: true
+  NestedBlockDepth:
+    active: true
+  ComplexCondition:
+    active: true
+  ComplexInterface:
+    active: true
+
+exceptions:
+  active: true
+
+style:
+  UnusedPrivateMember:
+    active: true
+  UnusedParameter:
+    active: true
+  UnusedPrivateProperty:
+    active: true

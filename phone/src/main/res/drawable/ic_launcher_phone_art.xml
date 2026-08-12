@@ -1,0 +1,6 @@
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:src="@drawable/ic_launcher_phone_art_bitmap"
+    android:gravity="fill"
+    android:antialias="true"
+    android:filter="true"
+    android:dither="true" />

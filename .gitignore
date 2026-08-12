@@ -1,0 +1,30 @@
+# Signing — never commit
+*.jks
+*.keystore
+keystore.properties
+
+# Local SDK/config
+local.properties
+
+# Gradle / Android Studio build artifacts
+**/.gradle/
+**/.kotlin/
+**/build/
+**/.idea/
+*.iml
+
+# Packaged output
+*.apk
+*.aab
+APK/
+
+# Detekt / lint reports
+**/reports/
+
+# OS / editor cruft
+.DS_Store
+*.log
+
+# Ad-hoc UI Automator dumps / debug artifacts
+ui.xml
+ui2.xml
