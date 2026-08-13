@@ -90,8 +90,8 @@ class NotificationRelayService : NotificationListenerService() {
             skipNotification(sbn, "app_paused", snapshot)
             return
         }
-        if (!settings.screenWake) {
-            skipNotification(sbn, "screen_wake_disabled", snapshot)
+        if (settings.hasNoWatchReaction) {
+            skipNotification(sbn, "no_watch_reaction", snapshot)
             return
         }
         if (!settings.isPackageAllowed(sbn.packageName)) {
@@ -235,8 +235,8 @@ class NotificationRelayService : NotificationListenerService() {
             skipNotification(active, "app_paused", snapshot)
             return
         }
-        if (!settings.screenWake || !settings.isPackageAllowed(active.packageName)) {
-            skipNotification(active, if (!settings.screenWake) "screen_wake_disabled" else "app_filter", snapshot)
+        if (settings.hasNoWatchReaction || !settings.isPackageAllowed(active.packageName)) {
+            skipNotification(active, if (settings.hasNoWatchReaction) "no_watch_reaction" else "app_filter", snapshot)
             return
         }
         if (snapshot.isLocalOnly) {
@@ -268,25 +268,35 @@ class NotificationRelayService : NotificationListenerService() {
             return
         }
 
+        // Computed before the rate limiter so it can tell that dropping this notification would
+        // not merely cost a screen wake — the watch would never see the message at all.
+        val mirror = if (settings.mirrorUndelivered) mirrorContent(active, snapshot) else null
         val rateDecision = wakeRateLimiter.decideAndMark(
             packageName = active.packageName,
             contentHash = candidate.contentHash,
             now = now,
+            carriesMirror = mirror != null,
         )
         if (rateDecision.skip) {
             skipNotification(active, rateDecision.reason, snapshot)
             return
         }
 
-        forwardNotification(active, snapshot, settings)
+        forwardNotification(active, snapshot, settings, mirror, rateDecision.suppressScreenWake)
     }
 
     private fun forwardNotification(
         sbn: StatusBarNotification,
         snapshot: NotificationSnapshot,
         settings: PhoneSettings,
+        mirror: JSONObject?,
+        suppressScreenWake: Boolean,
     ) {
-        val triggerDetail = snapshot.compactDetail
+        val triggerDetail = buildString {
+            append(snapshot.compactDetail)
+            append(" mirror=").append(if (mirror != null) 1 else 0)
+            append(" screenBurstSuppressed=").append(if (suppressScreenWake) 1 else 0)
+        }
         EventHistoryStore.add(this, "NOTIFICATION", "FORWARDED", triggerDetail)
 
         val payload = JSONObject()
@@ -295,11 +305,14 @@ class NotificationRelayService : NotificationListenerService() {
             .put("notificationId", sbn.id)
             .put("groupKey", sbn.groupKey)
             .put("postTime", sbn.postTime)
+            .put("screenWake", settings.screenWake && !suppressScreenWake)
             .put("phoneDndBlocksWake", isPhoneDndBlocking() && !settings.wakeScreenOnPhoneDnd)
             .put("respectWatchDnd", settings.respectWatchDnd)
             .put("skipWakeOffWrist", settings.skipWakeOffWrist)
             .put("skipSoundOffWrist", settings.skipSoundOffWrist)
             .put("soundMode", settings.soundMode.wireValue)
+            .put("vibrateOnWake", settings.vibrateOnWake)
+        mirror?.let { payload.put("mirror", it) }
         val envelope = MessageEnvelope(type = "WAKE", payload = payload)
         WearTransport.sendPreferred(this, Protocol.WAKE, envelope) { result ->
             EventHistoryStore.add(
@@ -330,6 +343,60 @@ class NotificationRelayService : NotificationListenerService() {
         }
         return true
     }
+
+    /**
+     * Content for the watch to display itself, or null when the bridge is expected to deliver.
+     *
+     * Reddit chat DMs arrive as a lone group summary with no child notification, and Wear OS
+     * drops summaries like that when bridging — the wrist buzzes with nothing to look at. That
+     * is the only case we know for certain never reaches the watch, so it is the only one
+     * mirrored: everything else OHealth shows on its own and a mirror would just double it.
+     */
+    private fun mirrorContent(sbn: StatusBarNotification, snapshot: NotificationSnapshot): JSONObject? {
+        if (!snapshot.isGroupSummary || hasGroupChildren(sbn)) return null
+        val extras = sbn.notification.extras
+        val title = extras.firstText(
+            Notification.EXTRA_CONVERSATION_TITLE,
+            Notification.EXTRA_TITLE,
+            Notification.EXTRA_TITLE_BIG,
+        )
+        val text = lastMessageText(sbn) ?: extras.firstText(
+            Notification.EXTRA_BIG_TEXT,
+            Notification.EXTRA_TEXT,
+            Notification.EXTRA_SUMMARY_TEXT,
+        )
+        if (title.isNullOrBlank() && text.isNullOrBlank()) return null
+        return JSONObject()
+            .put("title", title.orEmpty())
+            .put("text", text.orEmpty())
+            .put("appLabel", appLabel(sbn.packageName))
+    }
+
+    /** Defaults to true so an unreadable notification list never causes a duplicate on the watch. */
+    private fun hasGroupChildren(sbn: StatusBarNotification): Boolean = runCatching {
+        activeNotifications.orEmpty().any {
+            it.key != sbn.key &&
+                it.packageName == sbn.packageName &&
+                it.groupKey == sbn.groupKey &&
+                (it.notification.flags and Notification.FLAG_GROUP_SUMMARY) == 0
+        }
+    }.getOrDefault(true)
+
+    /** MessagingStyle apps keep the real per-message text here, not in EXTRA_TEXT. */
+    private fun lastMessageText(sbn: StatusBarNotification): String? = runCatching {
+        sbn.notification.extras.getParcelableArray(Notification.EXTRA_MESSAGES)
+            ?.let { Notification.MessagingStyle.Message.getMessagesFromBundleArray(it) }
+            ?.lastOrNull()
+            ?.text
+            ?.toString()
+    }.getOrNull()?.takeIf { it.isNotBlank() }
+
+    private fun appLabel(packageName: String): String = runCatching {
+        packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageName, 0)).toString()
+    }.getOrDefault(packageName)
+
+    private fun android.os.Bundle.firstText(vararg keys: String): String? = keys
+        .firstNotNullOfOrNull { getCharSequence(it)?.toString()?.takeIf(String::isNotBlank) }
 
     private fun isPhoneDndBlocking(): Boolean {
         val manager = getSystemService(NotificationManager::class.java)

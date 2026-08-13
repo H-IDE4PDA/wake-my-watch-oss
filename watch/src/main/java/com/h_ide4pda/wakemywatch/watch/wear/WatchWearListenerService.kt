@@ -23,11 +23,13 @@ import com.h_ide4pda.wakemywatch.core.Protocol
 import com.h_ide4pda.wakemywatch.core.SettingsAudit
 import com.h_ide4pda.wakemywatch.core.SettingsSync
 import com.h_ide4pda.wakemywatch.core.SoundMode
+import com.h_ide4pda.wakemywatch.core.VibroPatterns
 import com.h_ide4pda.wakemywatch.core.WearTransport
 import com.h_ide4pda.wakemywatch.watch.BuildConfig
 import com.h_ide4pda.wakemywatch.watch.WatchMainActivity
 import com.h_ide4pda.wakemywatch.watch.alarm.AlarmActivity
 import com.h_ide4pda.wakemywatch.watch.alarm.AlarmSession
+import com.h_ide4pda.wakemywatch.watch.mirror.MirrorNotifier
 import com.h_ide4pda.wakemywatch.watch.sensors.OffBodyStateMonitor
 import com.h_ide4pda.wakemywatch.watch.sound.SoundController
 import com.h_ide4pda.wakemywatch.watch.dnd.WatchDndSyncBridge
@@ -388,14 +390,19 @@ class WatchWearListenerService : WearableListenerService() {
         val synced = AppSettingsStore.load(this)
         val p = envelope.payload
         val respectDnd = p.optBoolean("respectWatchDnd", synced.respectWatchDnd)
+        val screenWake = p.optBoolean("screenWake", synced.screenWake)
         val phoneDndBlocksWake = p.optBoolean("phoneDndBlocksWake", false)
         val skipWakeOffWrist = p.optBoolean("skipWakeOffWrist", synced.skipWakeOffWrist)
         val skipSoundOffWrist = p.optBoolean("skipSoundOffWrist", synced.skipSoundOffWrist)
         val soundMode = SoundMode.fromWire(p.optInt("soundMode", synced.soundMode.wireValue))
+        val vibrateOnWake = p.optBoolean("vibrateOnWake", synced.vibrateOnWake)
         val sourcePackage = p.optString("packageName", "unknown_source").ifBlank { "unknown_source" }
 
         val dndBlocked = respectDnd && getSystemService(NotificationManager::class.java).currentInterruptionFilter != NotificationManager.INTERRUPTION_FILTER_ALL
-        val offWrist = OffBodyStateMonitor.supported && OffBodyStateMonitor.isWorn == false
+        val offWrist = OffBodyStateMonitor.isOffWrist(this)
+        // Sound and vibration are both wrist alerts, so they share the off-wrist rule —
+        // an unworn watch has nobody to alert.
+        val alertAllowed = !(offWrist && skipSoundOffWrist)
         val result: String
         val detail: String
 
@@ -409,20 +416,38 @@ class WatchWearListenerService : WearableListenerService() {
             detail = "watch_dnd"
         } else if (offWrist && skipWakeOffWrist) {
             result = "SKIPPED"
-            detail = "off_wrist"
-        } else if (phoneDndBlocksWake) {
-            // Only the screen wake is suppressed here — sound still plays normally,
-            // same as the regular path below (off-wrist sound rule still applies).
-            val soundResult = if (soundMode != SoundMode.NONE && !(offWrist && skipSoundOffWrist)) {
+            detail = "off_wrist(${OffBodyStateMonitor.decisionDetail(this)})"
+        } else if (!screenWake) {
+            // Screen wake switched off: the wrist alert is the whole point of the forward, so the
+            // panel deliberately stays dark. Lighting it up shows the watch face and nothing else
+            // whenever the phone demoted the notification below the threshold Wear OS needs to
+            // draw a card — a flash about nothing that costs battery.
+            val soundResult = if (soundMode != SoundMode.NONE && alertAllowed) {
                 SoundController.playNotification(this, soundMode)
             } else {
                 null
             }
+            val vibroDetail = vibrateIfEnabled(vibrateOnWake && alertAllowed)
             result = "WAKE_OK"
             detail = if (soundResult != null) {
-                "phone_dnd_wake_suppressed:${soundResult.detail}"
+                "screen_wake_off:${soundResult.detail}$vibroDetail"
             } else {
-                "phone_dnd_wake_suppressed:sound_skipped"
+                "screen_wake_off:sound_skipped$vibroDetail"
+            }
+        } else if (phoneDndBlocksWake) {
+            // Only the screen wake is suppressed here — sound and vibration still play normally,
+            // same as the regular path below (off-wrist alert rule still applies).
+            val soundResult = if (soundMode != SoundMode.NONE && alertAllowed) {
+                SoundController.playNotification(this, soundMode)
+            } else {
+                null
+            }
+            val vibroDetail = vibrateIfEnabled(vibrateOnWake && alertAllowed)
+            result = "WAKE_OK"
+            detail = if (soundResult != null) {
+                "phone_dnd_wake_suppressed:${soundResult.detail}$vibroDetail"
+            } else {
+                "phone_dnd_wake_suppressed:sound_skipped$vibroDetail"
             }
         } else {
             val wakeResult = WakeController.wake(this, envelope.eventId)
@@ -430,23 +455,47 @@ class WatchWearListenerService : WearableListenerService() {
                 result = "WAKE_FAILED"
                 detail = wakeResult.detail
             } else {
-                val soundResult = if (soundMode != SoundMode.NONE && !(offWrist && skipSoundOffWrist)) {
+                val soundResult = if (soundMode != SoundMode.NONE && alertAllowed) {
                     SoundController.playNotification(this, soundMode)
                 } else {
                     null
                 }
+                val vibroDetail = vibrateIfEnabled(vibrateOnWake && alertAllowed)
                 result = "WAKE_OK"
                 detail = when {
-                    offWrist -> "${wakeResult.detail}:without_sound_off_wrist"
-                    soundResult != null -> "${wakeResult.detail}:${soundResult.detail}"
-                    else -> "${wakeResult.detail}:sound_skipped"
+                    offWrist -> "${wakeResult.detail}:without_sound_off_wrist$vibroDetail"
+                    soundResult != null -> "${wakeResult.detail}:${soundResult.detail}$vibroDetail"
+                    else -> "${wakeResult.detail}:sound_skipped$vibroDetail"
                 }
             }
         }
 
-        val tracedDetail = "$sourcePackage:$detail"
+        // Only when something actually happened on the watch: a WAKE suppressed by DND, pause or
+        // off-wrist must not leave a card behind that the user never got alerted about.
+        val mirrorDetail = if (result == "SKIPPED") "" else mirrorIfRequested(p)
+        val tracedDetail = "$sourcePackage:$detail$mirrorDetail"
         EventHistoryStore.add(this, "WAKE", result, tracedDetail)
         sendAck(event.sourceNodeId, envelope.eventId, result, tracedDetail)
+    }
+
+    /** Posts the notification ourselves when the phone flagged it as one the bridge will drop. */
+    private fun mirrorIfRequested(payload: JSONObject): String {
+        val mirror = payload.optJSONObject("mirror") ?: return ""
+        val outcome = MirrorNotifier.show(
+            context = this,
+            title = mirror.optString("title"),
+            text = mirror.optString("text"),
+            appLabel = mirror.optString("appLabel"),
+            notificationKey = payload.optString("notificationKey"),
+        )
+        return ":$outcome"
+    }
+
+    /** Plays the wrist alert for a forwarded notification; returns a suffix for the event log. */
+    private fun vibrateIfEnabled(enabled: Boolean): String = when {
+        !enabled -> ":vibro_skipped"
+        VibroPatterns.playNotification(this) -> ":vibro"
+        else -> ":vibro_unavailable"
     }
 
     private fun handleAlarmStart(event: MessageEvent, envelope: MessageEnvelope) {

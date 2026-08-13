@@ -46,11 +46,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -81,12 +79,6 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-
-// Donation links go to the original author (H-IDE4PDA). If you fork this project,
-// replace these three with your own before distributing your build.
-private const val KOFI_URL = "https://Ko-fi.com/h_ide4pda"
-private const val MONOBANK_URL = "https://send.monobank.ua/jar/4W85VhKWit"
-private const val USDT_TRC20_ADDRESS = "TSB1MTtXw9DXxTt9oEkyKUbQkNTqLc2RLb"
 
 class PhoneMainActivity : ComponentActivity() {
     private var resumeCounter by mutableIntStateOf(0)
@@ -159,7 +151,6 @@ private fun PhoneApp(refreshToken: Int) {
     var activeDialog by remember { mutableStateOf<SettingsDialog?>(null) }
     var showAlarmWarning by remember { mutableStateOf(false) }
     var showLegal by remember { mutableStateOf(false) }
-    var showDonate by remember { mutableStateOf(false) }
     var remote by remember { mutableStateOf(DeviceStore.remote(context)) }
     var ack by remember { mutableStateOf(DeviceStore.lastAck(context)) }
     var connection by remember { mutableStateOf(ConnectionDiagnosticsStore.snapshot(context)) }
@@ -354,17 +345,18 @@ private fun PhoneApp(refreshToken: Int) {
                 onDevice = { page = Page.DEVICE },
                 onPermissions = { page = Page.PERMISSIONS },
                 onDiagnostics = { page = Page.DIAGNOSTICS },
-                onDonate = { showDonate = true },
                 onLegal = { showLegal = true },
                 onGrant = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) },
                 onTest = {
                     val payload = JSONObject()
                         .put("test", true)
                         .put("packageName", "wake_my_watch_test")
+                        .put("screenWake", settings.screenWake)
                         .put("respectWatchDnd", settings.respectWatchDnd)
                         .put("skipWakeOffWrist", settings.skipWakeOffWrist)
                         .put("skipSoundOffWrist", settings.skipSoundOffWrist)
                         .put("soundMode", settings.soundMode.wireValue)
+                        .put("vibrateOnWake", settings.vibrateOnWake)
                     val envelope = MessageEnvelope(type = "WAKE_TEST", payload = payload)
                     WearTransport.sendPreferred(context, Protocol.WAKE, envelope) { result ->
                         toastText = if (result.success) context.getString(R.string.test_sent) else result.detail
@@ -484,52 +476,6 @@ private fun PhoneApp(refreshToken: Int) {
         }
     }
 
-    if (showDonate) {
-        val clipboard = LocalClipboardManager.current
-        ModalBottomSheet(
-            onDismissRequest = { showDonate = false },
-            containerColor = WmwSurface,
-            contentColor = WmwText,
-        ) {
-            Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
-                Text(stringResource(R.string.donate_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.height(20.dp))
-                ActionCard(
-                    ImageVector.vectorResource(id = R.drawable.ic_local_cafe),
-                    stringResource(R.string.donate_kofi),
-                    stringResource(R.string.donate_kofi_summary),
-                    onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(KOFI_URL))) },
-                    tint = WmwGreen,
-                )
-                Spacer(Modifier.height(10.dp))
-                ActionCard(
-                    ImageVector.vectorResource(id = R.drawable.ic_account_balance),
-                    stringResource(R.string.donate_monobank),
-                    stringResource(R.string.donate_monobank_summary),
-                    onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(MONOBANK_URL))) },
-                    tint = WmwBlue,
-                )
-                Spacer(Modifier.height(10.dp))
-                ActionCard(
-                    ImageVector.vectorResource(id = R.drawable.ic_currency_exchange),
-                    stringResource(R.string.donate_usdt),
-                    USDT_TRC20_ADDRESS,
-                    onClick = {
-                        clipboard.setText(AnnotatedString(USDT_TRC20_ADDRESS))
-                        toastText = context.getString(R.string.donate_address_copied)
-                    },
-                    tint = WmwPurple,
-                )
-                Spacer(Modifier.height(6.dp))
-                Text(stringResource(R.string.donate_usdt_tap_copy), color = WmwMuted, fontSize = 12.sp)
-                Spacer(Modifier.height(20.dp))
-                Button(onClick = { showDonate = false }, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.close))
-                }
-            }
-        }
-    }
-
     toastText?.let { text ->
         LaunchedEffect(text) {
             android.widget.Toast.makeText(context, text, android.widget.Toast.LENGTH_SHORT).show()
@@ -559,7 +505,6 @@ private fun MainScreen(
     onDevice: () -> Unit,
     onPermissions: () -> Unit,
     onDiagnostics: () -> Unit,
-    onDonate: () -> Unit,
     onLegal: () -> Unit,
     onGrant: () -> Unit,
     onTest: () -> Unit,
@@ -610,38 +555,39 @@ private fun MainScreen(
                     Icons.Default.Lock,
                     stringResource(R.string.skip_when_phone_unlocked),
                     stringResource(R.string.skip_when_phone_unlocked_summary),
-                    enabled = settings.screenWake,
                     trailing = {
                         Switch(
                             checked = settings.skipWhenPhoneUnlocked,
                             onCheckedChange = { onSettings(settings.copy(skipWhenPhoneUnlocked = it)) },
-                            enabled = settings.screenWake,
                         )
                     },
-                    onClick = {
-                        if (settings.screenWake) {
-                            onSettings(settings.copy(skipWhenPhoneUnlocked = !settings.skipWhenPhoneUnlocked))
-                        }
-                    },
+                    onClick = { onSettings(settings.copy(skipWhenPhoneUnlocked = !settings.skipWhenPhoneUnlocked)) },
                 )
                 DividerLine()
                 SettingRow(
                     Icons.Default.Notifications,
                     stringResource(R.string.skip_silent_notifications),
                     stringResource(R.string.skip_silent_notifications_summary),
-                    enabled = settings.screenWake,
                     trailing = {
                         Switch(
                             checked = settings.skipSilentNotifications,
                             onCheckedChange = { onSettings(settings.copy(skipSilentNotifications = it)) },
-                            enabled = settings.screenWake,
                         )
                     },
-                    onClick = {
-                        if (settings.screenWake) {
-                            onSettings(settings.copy(skipSilentNotifications = !settings.skipSilentNotifications))
-                        }
+                    onClick = { onSettings(settings.copy(skipSilentNotifications = !settings.skipSilentNotifications)) },
+                )
+                DividerLine()
+                SettingRow(
+                    ImageVector.vectorResource(id = R.drawable.ic_open_in_full),
+                    stringResource(R.string.mirror_undelivered),
+                    stringResource(R.string.mirror_undelivered_summary),
+                    trailing = {
+                        Switch(
+                            checked = settings.mirrorUndelivered,
+                            onCheckedChange = { onSettings(settings.copy(mirrorUndelivered = it)) },
+                        )
                     },
+                    onClick = { onSettings(settings.copy(mirrorUndelivered = !settings.mirrorUndelivered)) },
                 )
                 DividerLine()
                 SettingRow(ImageVector.vectorResource(id = R.drawable.ic_volume_up), stringResource(R.string.sound_mode), soundModeLabel(settings), onClick = onSound)
@@ -721,8 +667,6 @@ private fun MainScreen(
         ActionCard(Icons.Default.Lock, stringResource(R.string.permissions_and_background), stringResource(R.string.permissions_and_background_summary), onPermissions)
         Spacer(Modifier.height(10.dp))
         ActionCard(Icons.Default.Search, stringResource(R.string.diagnostics), stringResource(R.string.diagnostics_summary), onDiagnostics)
-        Spacer(Modifier.height(10.dp))
-        ActionCard(ImageVector.vectorResource(id = R.drawable.ic_coffee), stringResource(R.string.donate_title), stringResource(R.string.donate_summary), onDonate, tint = WmwGreen)
         Spacer(Modifier.height(20.dp))
         Text(stringResource(R.string.privacy_line), color = WmwMuted, fontSize = 12.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
         Footer(onLegal)
@@ -1092,6 +1036,16 @@ private fun SoundModeDialog(
                         )
                     }
                 }
+                DividerLine()
+                SwitchDialogRow(stringResource(R.string.vibrate_on_wake), settings.vibrateOnWake) {
+                    onSettings(settings.copy(vibrateOnWake = it))
+                }
+                Text(
+                    stringResource(R.string.vibrate_on_wake_summary),
+                    color = WmwMuted,
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp,
+                )
             }
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.done)) } },

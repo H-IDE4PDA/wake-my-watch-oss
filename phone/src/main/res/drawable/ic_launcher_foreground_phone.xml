@@ -1,0 +1,19 @@
+<!--
+    Adaptive icon foreground: the artwork itself.
+
+    The art used to sit in the *background* layer with a transparent foreground, which renders as
+    a blank circle on One UI — Samsung's icon frames draw their own backdrop and put only the
+    app's foreground layer on top of it, so an empty foreground means an empty icon.
+
+    Adaptive layers are 108dp with the mask cropping to roughly the central 72dp. The inset is
+    deliberately smaller than that, so the art still bleeds past the mask edge and no transparent
+    gap appears when a launcher applies parallax, while the watch face stays inside the safe zone.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:drawable="@drawable/ic_launcher_phone_art"
+        android:left="12dp"
+        android:top="12dp"
+        android:right="12dp"
+        android:bottom="12dp" />
+</layer-list>
