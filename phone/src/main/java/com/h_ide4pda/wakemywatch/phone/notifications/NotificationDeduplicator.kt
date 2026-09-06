@@ -12,7 +12,12 @@ class NotificationDeduplicator {
 
     fun shouldSkip(sbn: StatusBarNotification, now: Long = System.currentTimeMillis()): Pair<Boolean, String> {
         val n = sbn.notification
-        if ((n.flags and Notification.FLAG_GROUP_SUMMARY) != 0) return true to "group_summary"
+        // Group summaries used to be dropped unconditionally, on the assumption that a summary
+        // always ships alongside children and the children are the real notifications. Reddit's
+        // chat DMs break it: each one is posted as a lone summary (id=0, tag=room) with no child
+        // at all, so the message vanished before it could reach the watch. Summaries now go
+        // through the ordinary rules — the related_duplicate check below already collapses a
+        // summary and its children into one wake, and the wake cooldown catches late stragglers.
         val contentHash = contentFingerprint(sbn)
         val group = sbn.groupKey
         val current = Seen(now, contentHash, sbn.key, group, sbn.postTime)

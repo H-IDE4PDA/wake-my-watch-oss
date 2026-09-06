@@ -35,6 +35,15 @@ data class AppSettings(
     val skipWakeOffWrist: Boolean = true,
     val skipSoundOffWrist: Boolean = true,
     val soundMode: SoundMode = SoundMode.SYSTEM,
+    // Vibrates the watch on every forwarded notification. The bridged notification itself keeps
+    // whatever alerting the phone gave it — apps demoted to IMPORTANCE_LOW arrive silent and
+    // without a wrist buzz, which on a watch is indistinguishable from not arriving at all.
+    // This makes the alert a watch-side decision driven by the app filter instead.
+    val vibrateOnWake: Boolean = true,
+    // Shows the notification on the watch ourselves, but only for the notifications the bridge
+    // provably drops: a lone group summary with no children (Reddit chat DMs). Everything else
+    // OHealth delivers on its own, so mirroring it would simply double up.
+    val mirrorUndelivered: Boolean = true,
     val alarmBridge: Boolean = false,
     val dndSyncEnabled: Boolean = false,
     val forceSoftwareDndSync: Boolean = false,
@@ -57,6 +66,15 @@ data class AppSettings(
         AppFilterMode.BLOCKLIST -> packageName !in appPackages
     }
 
+    /**
+     * True when a forwarded notification would produce nothing at all on the watch. `screenWake`
+     * used to gate the whole relay, which made "do not light the panel" mean "switch the app off"
+     * — the wrist buzz and the sound correction died with it. Each reaction now stands on its own
+     * and forwarding stops only once every one of them is off.
+     */
+    val hasNoWatchReaction: Boolean
+        get() = !screenWake && !vibrateOnWake && soundMode == SoundMode.NONE
+
     /** Paused with no exception: Alarm Bridge and DND Sync are silenced along with everything else. */
     val isFullyPaused: Boolean
         get() = appPaused && !pauseKeepsAlarmAndDnd
@@ -77,6 +95,8 @@ data class AppSettings(
         .put("skipWakeOffWrist", skipWakeOffWrist)
         .put("skipSoundOffWrist", skipSoundOffWrist)
         .put("soundMode", soundMode.wireValue)
+        .put("vibrateOnWake", vibrateOnWake)
+        .put("mirrorUndelivered", mirrorUndelivered)
         .put("alarmBridge", alarmBridge)
         .put("dndSyncEnabled", dndSyncEnabled)
         .put("forceSoftwareDndSync", forceSoftwareDndSync)
@@ -108,6 +128,8 @@ data class AppSettings(
                 skipWakeOffWrist = json.optBoolean("skipWakeOffWrist", true),
                 skipSoundOffWrist = json.optBoolean("skipSoundOffWrist", true),
                 soundMode = SoundMode.fromWire(json.optInt("soundMode", SoundMode.SYSTEM.wireValue)),
+                vibrateOnWake = json.optBoolean("vibrateOnWake", true),
+                mirrorUndelivered = json.optBoolean("mirrorUndelivered", true),
                 alarmBridge = json.optBoolean("alarmBridge", false),
                 dndSyncEnabled = json.optBoolean("dndSyncEnabled", false),
                 forceSoftwareDndSync = json.optBoolean("forceSoftwareDndSync", false),

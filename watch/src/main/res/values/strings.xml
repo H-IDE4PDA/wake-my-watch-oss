@@ -46,4 +46,5 @@
     <string name="dnd_sync_open_adb_guide_phone_summary">Reliable ADB setup</string>
     <string name="dnd_sync_refresh_status">Refresh status</string>
     <string name="alarm_notification_channel_name">Alarm screen</string>
+    <string name="mirror_notification_channel_name">Notifications the bridge dropped</string>
 </resources>

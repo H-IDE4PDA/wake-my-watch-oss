@@ -46,4 +46,5 @@
     <string name="dnd_sync_open_adb_guide_phone_summary">Надёжная настройка через ADB</string>
     <string name="dnd_sync_refresh_status">Обновить статус</string>
     <string name="alarm_notification_channel_name">Экран будильника</string>
+    <string name="mirror_notification_channel_name">Уведомления, потерянные мостом</string>
 </resources>
