@@ -10,7 +10,7 @@
     <string name="pause_keeps_alarm_and_dnd_summary">While paused, ordinary notifications stay silent, but alarm forwarding to the watch, Do Not Disturb sync and sound-profile sync keep working</string>
     <string name="paused_stays_active">Stays active while paused</string>
     <string name="screen_wake">Screen Wake</string>
-    <string name="screen_wake_summary">Light up the watch screen for new notifications. This controls the screen only — sound and vibration on the watch are set up separately and keep working even with the screen off.</string>
+    <string name="screen_wake_summary">Turn on the watch screen for new notifications. Sound and vibration are configured separately and work independently of the screen.</string>
     <string name="skip_when_phone_unlocked">Do not wake while phone is unlocked</string>
     <string name="skip_when_phone_unlocked_summary">Do not wake or play sound on the watch while the phone is in use</string>
     <string name="silent_notifications">Silent notifications</string>
@@ -24,12 +24,12 @@
     <string name="silent_wake_only">Screen only for silent</string>
     <string name="silent_vibrate_only">Vibration only for silent</string>
     <string name="mirror_undelivered">Show notifications the watch never gets</string>
-    <string name="mirror_undelivered_summary">Some notifications never reach the watch at all — for example private messages sent as a lone group summary with nothing nested inside, which the stock sync loses in transit. The watch buzzes with nothing to open. This shows those, and only those, on the watch itself. Anything the watch already receives is left alone, so nothing is duplicated. New, off by default — turn it on and see if it helps.</string>
+    <string name="mirror_undelivered_summary">Some notifications reach the watch empty — it vibrates but there is nothing to open. This setting shows those notifications using the watch itself. Everything else is left alone, so there will be no duplicates.</string>
     <string name="sound_mode">Sound Mode</string>
     <string name="ringer_sync_enable">Sync the sound profile between phone and watch</string>
-    <string name="ringer_sync_summary">Change the sound mode on the phone and the watch follows. Off by default.\n\n\"Sound\" and \"vibrate\" carry straight over. When the phone goes \"silent\" the watch goes quiet through Do Not Disturb (on OnePlus phones via Do Not Disturb sync, on other phones through Wake My Watch with ADB access — see Permissions and background).\n\nThe watch\'s sleep mode is never carried to the phone: the phone stays as you left it at night.</string>
+    <string name="ringer_sync_summary">Change the sound mode on the phone and the watch follows. Silence on the watch is done through Do Not Disturb.\n\nOn non-OnePlus phones this needs ADB permissions — see \"Permissions and background\". The watch sleep mode is not carried over to the phone.</string>
     <string name="ringer_reverse_sync_enable">Also switch the mode from the watch</string>
-    <string name="ringer_reverse_sync_summary">Off by default: the watch only follows the phone. Turn on to also change the phone\'s sound mode by changing it on the watch. \"Silent\" from the watch is still ignored — that comes from its sleep mode, not from you, and it would otherwise drop the phone into Do Not Disturb at night on its own.</string>
+    <string name="ringer_reverse_sync_summary">Lets you change the phone\'s sound mode from the watch. Silence from the watch is not carried over — otherwise the phone would go silent every night together with sleep mode.</string>
     <string name="ringer_schedule">Sound profile schedule</string>
     <string name="ringer_schedule_quiet_start">Quiet period starts (vibrate)</string>
     <string name="ringer_schedule_quiet_end">Quiet period ends (sound)</string>
@@ -124,9 +124,7 @@
     <string name="grant_access">Grant access</string>
     <string name="made_for">Made for 4PDA by H_IDE ↗</string>
     <string name="about_title">About the author and app</string>
-    <string name="legal_body">© 2026 H_IDE. All rights reserved.\n\nWake My Watch is distributed free of charge for personal, non-commercial use. Unmodified official APK files published by the author may be shared free of charge if the author name and the link to H_IDE’s 4PDA profile remain intact.\n\nThe app is provided “as is”, without express or implied warranties. The author does not guarantee compatibility with every device or future firmware and is not obliged to provide regular updates, bug fixes, or individual technical support.\n\nWake My Watch is not an official OnePlus, OPPO, Google, or Wear OS product. All trademarks belong to their respective owners.\n\nCompatibility status for 0.9 RC will be filled in after the current build passes the test matrix.
-
-ADB commands and all other actions related to the app are performed manually by the user and at the user’s own risk.</string>
+    <string name="legal_body">© 2026 H_IDE\n\nThe app is free. Official APKs may be shared freely without modification, keeping the author\'s name and a link to the H_IDE profile on 4PDA.\n\nThe source code is open under the MIT license: github.com/H-IDE4PDA/wake-my-watch-oss — study it, modify it, build your own versions.\n\nProvided \"as is\", without warranties. Compatibility with all devices and firmware versions is not guaranteed; regular updates and personal support are not promised.\n\nNot a product of OnePlus, OPPO, Google or Wear OS. ADB commands and all other actions are performed by the user at their own risk.</string>
     <string name="close">Close</string>
     <string name="donate_title">Buy me a coffee</string>
     <string name="donate_summary">Support the developer</string>

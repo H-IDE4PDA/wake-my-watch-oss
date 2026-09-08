@@ -31,6 +31,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,8 +54,14 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
@@ -160,6 +167,9 @@ private fun PhoneApp(refreshToken: Int) {
     val mainHandler = remember { Handler(Looper.getMainLooper()) }
     val appScope = rememberCoroutineScope()
     var page by remember { mutableStateOf(Page.MAIN) }
+    // Hoisted here (survives leaving/re-entering MainScreen) so the main list returns to where
+    // the user left it after visiting a sub-page and pressing back.
+    val mainScrollState = rememberScrollState()
     var settings by remember { mutableStateOf(PhoneSettingsStore.load(context)) }
     var activeDialog by remember { mutableStateOf<SettingsDialog?>(null) }
     // Which ringer-schedule plan the edit screen is on; null while a brand-new plan is being added.
@@ -358,6 +368,7 @@ private fun PhoneApp(refreshToken: Int) {
         when (page) {
             Page.MAIN -> MainScreen(
                 modifier = Modifier.padding(padding),
+                scrollState = mainScrollState,
                 settings = settings,
                 remote = remote,
                 ack = ack,
@@ -552,10 +563,48 @@ private fun PhoneApp(refreshToken: Int) {
             containerColor = WmwSurface,
             contentColor = WmwText,
         ) {
-            Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 560.dp)
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 32.dp),
+            ) {
                 Text(stringResource(R.string.about_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(16.dp))
-                Text(stringResource(R.string.legal_body), color = WmwMuted, lineHeight = 21.sp)
+                // Body scrolls within the remaining space; the button below stays pinned and
+                // visible no matter how long the text is. The GitHub URL inside the text is a
+                // tappable link (theme colour, opens the browser); the rest stays plain.
+                val legalBody = stringResource(R.string.legal_body)
+                val legalText = remember(legalBody) {
+                    val linkLabel = "github.com/H-IDE4PDA/wake-my-watch-oss"
+                    val linkUrl = "https://github.com/H-IDE4PDA/wake-my-watch-oss"
+                    val at = legalBody.indexOf(linkLabel)
+                    buildAnnotatedString {
+                        if (at < 0) {
+                            append(legalBody)
+                        } else {
+                            append(legalBody.substring(0, at))
+                            withLink(
+                                LinkAnnotation.Url(
+                                    linkUrl,
+                                    TextLinkStyles(
+                                        SpanStyle(color = WmwBlue, textDecoration = TextDecoration.Underline),
+                                    ),
+                                ),
+                            ) { append(linkLabel) }
+                            append(legalBody.substring(at + linkLabel.length))
+                        }
+                    }
+                }
+                Text(
+                    legalText,
+                    color = WmwMuted,
+                    lineHeight = 21.sp,
+                    modifier = Modifier
+                        .weight(1f, fill = false)
+                        .verticalScroll(rememberScrollState()),
+                )
                 Spacer(Modifier.height(20.dp))
                 Button(onClick = { showLegal = false }, modifier = Modifier.fillMaxWidth()) {
                     Text(stringResource(R.string.close))
@@ -623,6 +672,7 @@ private fun PhoneApp(refreshToken: Int) {
 @Composable
 private fun MainScreen(
     modifier: Modifier,
+    scrollState: ScrollState,
     settings: PhoneSettings,
     remote: DeviceDescriptor?,
     ack: Pair<Long, String>,
@@ -650,7 +700,7 @@ private fun MainScreen(
     val context = LocalContext.current
     val hasAccess = NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.packageName)
     Column(
-        modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp),
+        modifier = modifier.fillMaxSize().verticalScroll(scrollState).padding(horizontal = 18.dp),
     ) {
         Spacer(Modifier.height(18.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
