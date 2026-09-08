@@ -37,6 +37,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -681,7 +682,7 @@ private fun MainScreen(
         AnimatedVisibility(visible = !settings.appPaused, enter = expandVertically(), exit = shrinkVertically()) {
             SettingsPanel {
                 SettingRow(
-                    Icons.Default.Notifications,
+                    ImageVector.vectorResource(id = R.drawable.ic_light_mode),
                     stringResource(R.string.screen_wake),
                     stringResource(R.string.screen_wake_summary),
                     trailing = { Switch(settings.screenWake, { onSettings(settings.copy(screenWake = it)) }) },
@@ -737,7 +738,7 @@ private fun MainScreen(
                 )
                 DividerLine()
                 SettingRow(
-                    ImageVector.vectorResource(id = R.drawable.ic_graphic_eq),
+                    ImageVector.vectorResource(id = R.drawable.ic_swap_vert),
                     stringResource(R.string.ringer_reverse_sync_enable),
                     stringResource(R.string.ringer_reverse_sync_summary),
                     enabled = settings.ringerSyncEnabled,
@@ -842,11 +843,11 @@ private fun MainScreen(
         AnimatedVisibility(visible = !settings.appPaused, enter = expandVertically(), exit = shrinkVertically()) {
             Column {
                 Spacer(Modifier.height(14.dp))
-                ActionCard(ImageVector.vectorResource(id = R.drawable.ic_graphic_eq), stringResource(R.string.test_wake), stringResource(R.string.test_wake_summary), onTest)
+                ActionCard(Icons.AutoMirrored.Filled.Send, stringResource(R.string.test_wake), stringResource(R.string.test_wake_summary), onTest)
             }
         }
         Spacer(Modifier.height(10.dp))
-        ActionCard(Icons.Default.Lock, stringResource(R.string.permissions_and_background), stringResource(R.string.permissions_and_background_summary), onPermissions)
+        ActionCard(ImageVector.vectorResource(id = R.drawable.ic_admin_panel_settings), stringResource(R.string.permissions_and_background), stringResource(R.string.permissions_and_background_summary), onPermissions)
         Spacer(Modifier.height(10.dp))
         ActionCard(Icons.Default.Search, stringResource(R.string.diagnostics), stringResource(R.string.diagnostics_summary), onDiagnostics)
         Spacer(Modifier.height(10.dp))
@@ -2553,19 +2554,27 @@ private fun PageHeader(title: String, onBack: () -> Unit) {
 }
 
 @Composable
-private fun DeviceCard(remote: DeviceDescriptor?, ack: Pair<Long, String>, connected: Boolean, onClick: () -> Unit) {
+private fun DeviceCard(
+    remote: DeviceDescriptor?,
+    ack: Pair<Long, String>,
+    connected: Boolean,
+    onClick: (() -> Unit)? = null,
+) {
+    // onClick == null on the Device Info screen itself: the card there leads nowhere, so it is
+    // not clickable and shows no chevron. On the main screen it navigates here.
+    val clickModifier = if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier
     Surface(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        modifier = Modifier.fillMaxWidth().then(clickModifier),
         shape = RoundedCornerShape(22.dp), color = WmwCard,
         border = BorderStroke(1.dp, WmwBlue.copy(alpha = .45f)),
     ) {
         Row(Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(64.dp).clip(RoundedCornerShape(18.dp)).background(WmwSurface), contentAlignment = Alignment.Center) {
-                Icon(Icons.Default.Refresh, null, tint = WmwBlue, modifier = Modifier.size(38.dp))
+                Icon(ImageVector.vectorResource(id = R.drawable.ic_watch), null, tint = WmwBlue, modifier = Modifier.size(38.dp))
             }
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
-                Text(remote?.displayName ?: stringResource(R.string.searching_watch), fontWeight = FontWeight.Bold, fontSize = 19.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(remote?.headline ?: stringResource(R.string.searching_watch), fontWeight = FontWeight.Bold, fontSize = 19.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(5.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(8.dp).clip(RoundedCornerShape(8.dp)).background(if (connected) WmwGreen else WmwMuted))
@@ -2574,7 +2583,7 @@ private fun DeviceCard(remote: DeviceDescriptor?, ack: Pair<Long, String>, conne
                 }
                 if (ack.first > 0) Text("${stringResource(R.string.last_ack)}: ${DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(ack.first))}", color = WmwMuted, fontSize = 12.sp)
             }
-            Icon(Icons.Default.KeyboardArrowRight, null, tint = WmwMuted)
+            if (onClick != null) Icon(Icons.Default.KeyboardArrowRight, null, tint = WmwMuted)
         }
     }
 }
@@ -2708,7 +2717,7 @@ private fun Footer(onLegal: () -> Unit) {
 private fun DeviceInfoScreen(modifier: Modifier, remote: DeviceDescriptor?, ack: Pair<Long, String>, connection: ConnectionSnapshot, onBack: () -> Unit, onResync: () -> Unit, onLegal: () -> Unit) {
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
         PageHeader(stringResource(R.string.device_info), onBack)
-        DeviceCard(remote, ack, connection.isConnected(remote?.nodeId), onClick = {})
+        DeviceCard(remote, ack, connection.isConnected(remote?.nodeId))
         Spacer(Modifier.height(18.dp))
         SettingsPanel {
             DetailRow(stringResource(R.string.model), remote?.displayName)

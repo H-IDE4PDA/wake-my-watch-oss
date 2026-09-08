@@ -1,0 +1,163 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:OffBodyStateMonitor.kt$OffBodyStateMonitor$@Synchronized fun updateRegistration(context: Context, settings: AppSettings)</ID>
+    <ID>CyclomaticComplexMethod:WatchMainActivity.kt$@Composable private fun WatchApp(resumeVersion: Long)</ID>
+    <ID>CyclomaticComplexMethod:WatchMainActivity.kt$@Composable private fun WatchMainScreen( settings: AppSettings, remote: DeviceDescriptor?, connected: Boolean, dndPermission: WatchDndPermissionState.Snapshot, onSettings: (AppSettings) -&gt; Unit, onSound: () -&gt; Unit, onDndSetup: () -&gt; Unit, onPauseSettings: () -&gt; Unit, onDevice: () -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:WatchWearListenerService.kt$WatchWearListenerService$override fun onMessageReceived(event: MessageEvent)</ID>
+    <ID>CyclomaticComplexMethod:WatchWearListenerService.kt$WatchWearListenerService$private fun handleWake(event: MessageEvent, envelope: MessageEnvelope)</ID>
+    <ID>FunctionNaming:AlarmActivity.kt$@Composable private fun AlarmIcon()</ID>
+    <ID>FunctionNaming:AlarmActivity.kt$@Composable private fun AlarmRoundActionButton( iconRes: Int, background: Color, content: Color, enabled: Boolean, onClick: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:AlarmActivity.kt$@Composable private fun AlarmScreen( session: AlarmSession, actionState: AlarmActionUiState, onAction: (String) -&gt; Unit, )</ID>
+    <ID>FunctionNaming:WatchLookAtPhoneScreen.kt$@Composable fun WatchLookAtPhoneScreen(onOk: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:WatchLookAtPhoneScreen.kt$@Composable private fun Spacer(height: androidx.compose.ui.unit.Dp = 12.dp)</ID>
+    <ID>FunctionNaming:WatchMainActivity.kt$@Composable private fun &lt;T&gt; WatchChoiceScreen( title: String, options: List&lt;Pair&lt;T, String&gt;&gt;, selected: T, onSelect: (T) -&gt; Unit, onBack: () -&gt; Unit, descriptions: Map&lt;T, String&gt; = emptyMap(), )</ID>
+    <ID>FunctionNaming:WatchMainActivity.kt$@Composable private fun AppTitle()</ID>
+    <ID>FunctionNaming:WatchMainActivity.kt$@Composable private fun RotaryScrollColumn( contentPadding: PaddingValues, content: @Composable ColumnScope.() -&gt; Unit, )</ID>
+    <ID>FunctionNaming:WatchMainActivity.kt$@Composable private fun WatchApp(resumeVersion: Long)</ID>
+    <ID>FunctionNaming:WatchMainActivity.kt$@Composable private fun WatchDeviceScreen(remote: DeviceDescriptor?, ack: Pair&lt;Long, String&gt;, connection: ConnectionSnapshot, onBack: () -&gt; Unit, onResync: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:WatchMainActivity.kt$@Composable private fun WatchDndSetupScreen( snapshot: WatchDndPermissionState.Snapshot, onBack: () -&gt; Unit, onRefresh: () -&gt; Unit, onOpenPhoneGuide: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:WatchMainActivity.kt$@Composable private fun WatchMainScreen( settings: AppSettings, remote: DeviceDescriptor?, connected: Boolean, dndPermission: WatchDndPermissionState.Snapshot, onSettings: (AppSettings) -&gt; Unit, onSound: () -&gt; Unit, onDndSetup: () -&gt; Unit, onPauseSettings: () -&gt; Unit, onDevice: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:WatchMainActivity.kt$@Composable private fun WatchPermissionStatusChip(title: String, granted: Boolean)</ID>
+    <ID>FunctionNaming:WatchMainActivity.kt$@Composable private fun WmwChip(label: String, secondary: String, onClick: () -&gt; Unit)</ID>
+    <ID>LongMethod:AlarmActivity.kt$@Composable private fun AlarmScreen( session: AlarmSession, actionState: AlarmActionUiState, onAction: (String) -&gt; Unit, )</ID>
+    <ID>LongMethod:WatchLookAtPhoneScreen.kt$@Composable fun WatchLookAtPhoneScreen(onOk: () -&gt; Unit)</ID>
+    <ID>LongMethod:WatchMainActivity.kt$@Composable private fun WatchApp(resumeVersion: Long)</ID>
+    <ID>LongMethod:WatchMainActivity.kt$@Composable private fun WatchMainScreen( settings: AppSettings, remote: DeviceDescriptor?, connected: Boolean, dndPermission: WatchDndPermissionState.Snapshot, onSettings: (AppSettings) -&gt; Unit, onSound: () -&gt; Unit, onDndSetup: () -&gt; Unit, onPauseSettings: () -&gt; Unit, onDevice: () -&gt; Unit, )</ID>
+    <ID>LongMethod:WatchWearListenerService.kt$WatchWearListenerService$override fun onMessageReceived(event: MessageEvent)</ID>
+    <ID>LongMethod:WatchWearListenerService.kt$WatchWearListenerService$private fun handleWake(event: MessageEvent, envelope: MessageEnvelope)</ID>
+    <ID>LongParameterList:WatchMainActivity.kt$( settings: AppSettings, remote: DeviceDescriptor?, connected: Boolean, dndPermission: WatchDndPermissionState.Snapshot, onSettings: (AppSettings) -&gt; Unit, onSound: () -&gt; Unit, onDndSetup: () -&gt; Unit, onPauseSettings: () -&gt; Unit, onDevice: () -&gt; Unit, )</ID>
+    <ID>LongParameterList:WatchMainActivity.kt$( title: String, options: List&lt;Pair&lt;T, String&gt;&gt;, selected: T, onSelect: (T) -&gt; Unit, onBack: () -&gt; Unit, descriptions: Map&lt;T, String&gt; = emptyMap(), )</ID>
+    <ID>MagicNumber:AlarmActivity.kt$0.45f</ID>
+    <ID>MagicNumber:AlarmActivity.kt$0xFF202127</ID>
+    <ID>MagicNumber:AlarmActivity.kt$0xFF2F80ED</ID>
+    <ID>MagicNumber:AlarmActivity.kt$0xFF4E6CF6</ID>
+    <ID>MagicNumber:AlarmActivity.kt$0xFFC8CDD8</ID>
+    <ID>MagicNumber:AlarmActivity.kt$0xFFFF9DAE</ID>
+    <ID>MagicNumber:AlarmActivity.kt$16</ID>
+    <ID>MagicNumber:AlarmActivity.kt$44</ID>
+    <ID>MagicNumber:AlarmAlertController.kt$AlarmAlertController$0.45</ID>
+    <ID>MagicNumber:AlarmAlertController.kt$AlarmAlertController$0.55f</ID>
+    <ID>MagicNumber:AlarmAlertController.kt$AlarmAlertController$1_000</ID>
+    <ID>MagicNumber:AlarmAlertController.kt$AlarmAlertController$210</ID>
+    <ID>MagicNumber:AlarmAlertController.kt$AlarmAlertController$250</ID>
+    <ID>MagicNumber:AlarmAlertController.kt$AlarmAlertController$30</ID>
+    <ID>MagicNumber:AlarmAlertController.kt$AlarmAlertController$420</ID>
+    <ID>MagicNumber:AlarmAlertController.kt$AlarmAlertController$60</ID>
+    <ID>MagicNumber:AlarmAlertController.kt$AlarmAlertController$650</ID>
+    <ID>MagicNumber:AlarmAlertController.kt$AlarmAlertController$700</ID>
+    <ID>MagicNumber:OffBodyStateMonitor.kt$OffBodyStateMonitor$0.5f</ID>
+    <ID>MagicNumber:WakeActivity.kt$WakeActivity$300L</ID>
+    <ID>MagicNumber:WakeController.kt$WakeController$1_000L</ID>
+    <ID>MagicNumber:WakeController.kt$WakeController$24</ID>
+    <ID>MagicNumber:WatchDndSyncBridge.kt$WatchDndSyncBridge$20</ID>
+    <ID>MagicNumber:WatchLookAtPhoneScreen.kt$0.42f</ID>
+    <ID>MagicNumber:WatchLookAtPhoneScreen.kt$0.58f</ID>
+    <ID>MagicNumber:WatchLookAtPhoneScreen.kt$1000</ID>
+    <ID>MagicNumber:WatchLookAtPhoneScreen.kt$1600</ID>
+    <ID>MagicNumber:WatchLookAtPhoneScreen.kt$2200</ID>
+    <ID>MagicNumber:WatchLookAtPhoneScreen.kt$300</ID>
+    <ID>MagicNumber:WatchLookAtPhoneScreen.kt$50</ID>
+    <ID>MagicNumber:WatchLookAtPhoneScreen.kt$900</ID>
+    <ID>MagicNumber:WatchMainActivity.kt$0xFFFFB74D</ID>
+    <ID>MagicNumber:WatchMainActivity.kt$45L</ID>
+    <ID>MagicNumber:WatchTheme.kt$WatchColors$0xFF00C2FF</ID>
+    <ID>MagicNumber:WatchTheme.kt$WatchColors$0xFF00E676</ID>
+    <ID>MagicNumber:WatchTheme.kt$WatchColors$0xFF081526</ID>
+    <ID>MagicNumber:WatchTheme.kt$WatchColors$0xFF7B61F6</ID>
+    <ID>MagicNumber:WatchTheme.kt$WatchColors$0xFFA9B4C8</ID>
+    <ID>MagicNumber:WatchWearListenerService.kt$WatchWearListenerService$2</ID>
+    <ID>MagicNumber:WatchWearListenerService.kt$WatchWearListenerService$24_000</ID>
+    <ID>MatchingDeclarationName:WatchTheme.kt$WatchColors</ID>
+    <ID>MaxLineLength:AlarmActivity.kt$AlarmActivity.Companion$"direct=failed:${directResult.exceptionOrNull()?.message ?: directResult.exceptionOrNull()?.javaClass?.simpleName}"</ID>
+    <ID>MaxLineLength:AlarmActivity.kt$AlarmActivity.Companion$.</ID>
+    <ID>MaxLineLength:AlarmActivity.kt$AlarmActivity.Companion$val newId = if (previousId == ALARM_NOTIFICATION_ID) ALARM_SCREEN_OFF_NOTIFICATION_ID_ALT else ALARM_NOTIFICATION_ID</ID>
+    <ID>MaxLineLength:AlarmActivity.kt$if</ID>
+    <ID>MaxLineLength:AlarmAlertController.kt$AlarmAlertController$EventHistoryStore.add(context, "ALARM_SOUND", "RINGTONE_FAILED", error.message ?: error.javaClass.simpleName)</ID>
+    <ID>MaxLineLength:AlarmAlertController.kt$AlarmAlertController$cyclePosition &gt; toneSamples - releaseSamples -&gt; (toneSamples - cyclePosition).toDouble() / releaseSamples.coerceAtLeast(1)</ID>
+    <ID>MaxLineLength:AlarmAlertController.kt$AlarmAlertController$if</ID>
+    <ID>MaxLineLength:SoundController.kt$SoundController$if (systemPlayed) "system_correction_${SYSTEM_CORRECTION_PLAYBACK_MS}ms_mediaplayer" else "system_unavailable"</ID>
+    <ID>MaxLineLength:WakeController.kt$WakeController$val lockPart = if (viaActivity) "lockAcquired=нет(activity_fallback)" else "lockAcquired=${if (lockAcquired) "да" else "нет"}"</ID>
+    <ID>MaxLineLength:WatchDndPermissionState.kt$WatchDndPermissionState$currentInterruptionFilter = runCatching { notificationManager.currentInterruptionFilter }.getOrDefault(NotificationManager.INTERRUPTION_FILTER_UNKNOWN)</ID>
+    <ID>MaxLineLength:WatchDndPermissionState.kt$WatchDndPermissionState$dndPolicyAccessGranted = runCatching { notificationManager.isNotificationPolicyAccessGranted }.getOrDefault(false)</ID>
+    <ID>MaxLineLength:WatchDndPermissionState.kt$WatchDndPermissionState$notificationListenerGranted = NotificationManagerCompat.getEnabledListenerPackages(app).contains(app.packageName)</ID>
+    <ID>MaxLineLength:WatchDndPermissionState.kt$WatchDndPermissionState$postNotificationsGranted = runCatching { NotificationManagerCompat.from(app).areNotificationsEnabled() }.getOrDefault(false)</ID>
+    <ID>MaxLineLength:WatchDndSyncBridge.kt$WatchDndSyncBridge$EventHistoryStore.add(context, "DND_SYNC", "APPLIED_PHONE_TO_WATCH", "filter=$filter previous=$current${modeSuffix(settings.forceSoftwareDndSync)}")</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$Box(Modifier.size(7.dp).background(if (connected) Green else Muted, RoundedCornerShape(7.dp)))</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$Icon(ToggleChipDefaults.switchIcon(checked = settings.screenWake), contentDescription = null)</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$WatchMainActivity$"version=${BuildConfig.VERSION_NAME} device=${Build.MANUFACTURER} ${Build.MODEL} wear=${Build.VERSION.RELEASE} api=${Build.VERSION.SDK_INT}"</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$WatchMainActivity$EventHistoryStore.add(this, "SETTINGS_SNAPSHOT", "app_start", SettingsAudit.snapshot(AppSettingsStore.load(this)))</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$WatchMainActivity$if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) return</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$if</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$if (connected) stringResource(R.string.connected) else stringResource(R.string.disconnected)</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$if (connection.lastAckAt &gt; 0L) connection.lastAckResult.ifBlank { stringResource(R.string.received) } else if (ack.first &gt; 0L) ack.second.ifBlank { stringResource(R.string.received) } else stringResource(R.string.not_available)</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$if (dndPermission.ready) stringResource(R.string.dnd_sync_ready) else stringResource(R.string.dnd_sync_setup_needed)</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$if (settings.appPaused) stringResource(R.string.app_paused_status_on) else stringResource(R.string.app_paused_status_off)</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$if (settings.pauseKeepsAlarmAndDnd) stringResource(R.string.pause_keeps_alarm_and_dnd) else stringResource(R.string.pause_silence_everything)</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$if (settings.screenWake) stringResource(R.string.enabled) else stringResource(R.string.disabled)</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$if (snapshot.ready) stringResource(R.string.dnd_sync_ready) else stringResource(R.string.dnd_sync_setup_needed)</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$label = { Text(remote?.displayName ?: stringResource(R.string.searching_phone), maxLines = 1, overflow = TextOverflow.Ellipsis) }</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$private</ID>
+    <ID>MaxLineLength:WatchMainActivity.kt$remote?.let { "${if (connection.isConnected(it.nodeId)) stringResource(R.string.connected) else stringResource(R.string.disconnected)} · Android ${it.osRelease} · ${it.appVersion}" } ?: stringResource(R.string.tap_to_resync)</ID>
+    <ID>MaxLineLength:WatchRingerSyncBridge.kt$WatchRingerSyncBridge$"RINGER_SYNC_APPLIED_WATCH" to "mode=${RingerSync.name(mode)} previous=${current?.let(RingerSync::name) ?: "unknown"}"</ID>
+    <ID>MaxLineLength:WatchRingerSyncBridge.kt$WatchRingerSyncBridge$"expected=${RingerSync.name(expectedMode)} actual=${RingerSync.name(now)} after=${OVERRIDE_CHECK_DELAY_MS}ms (likely sync_parent_sounds)"</ID>
+    <ID>MaxLineLength:WatchRingerSyncBridge.kt$WatchRingerSyncBridge$"source=$source mode=${RingerSync.name(mode)} previous=${current?.let(RingerSync::name) ?: "unknown"} readback=${RingerSync.name(applied)}"</ID>
+    <ID>MaxLineLength:WatchRingerSyncBridge.kt$WatchRingerSyncBridge$EventHistoryStore.add(context, "RINGER_SYNC", "SKIPPED", "already_applied_watch source=$source mode=${RingerSync.name(mode)}")</ID>
+    <ID>MaxLineLength:WatchRingerSyncBridge.kt$WatchRingerSyncBridge$EventHistoryStore.add(context, "RINGER_SYNC", "SKIPPED", "disabled_watch_change mode=${RingerSync.name(mode)}")</ID>
+    <ID>MaxLineLength:WatchRingerSyncBridge.kt$WatchRingerSyncBridge$val now = runCatching { appContext.getSystemService(AudioManager::class.java).ringerMode }.getOrNull() ?: return@postDelayed</ID>
+    <ID>MaxLineLength:WatchWearListenerService.kt$WatchWearListenerService$"value=$value filter=$currentInterruptionFilter listener=${permSnapshot.notificationListenerGranted} dndPolicy=${permSnapshot.dndPolicyAccessGranted} post=${permSnapshot.postNotificationsGranted}"</ID>
+    <ID>MaxLineLength:WatchWearListenerService.kt$WatchWearListenerService$.</ID>
+    <ID>MaxLineLength:WatchWearListenerService.kt$WatchWearListenerService$EventHistoryStore.add(this, "DIAGNOSTICS", "REPORT_CHANNEL_FAILED", "requestId=$requestId error=$error")</ID>
+    <ID>MaxLineLength:WatchWearListenerService.kt$WatchWearListenerService$EventHistoryStore.add(this, "DIAGNOSTICS", "REPORT_CHANNEL_FAILED", "requestId=$requestId error=${error.message ?: error.javaClass.simpleName}")</ID>
+    <ID>MaxLineLength:WatchWearListenerService.kt$WatchWearListenerService$EventHistoryStore.add(this, "DIAGNOSTICS", "REPORT_CHANNEL_SENT", "requestId=$requestId bytes=${bytes.size}")</ID>
+    <ID>MaxLineLength:WatchWearListenerService.kt$WatchWearListenerService$EventHistoryStore.add(this, "DIAGNOSTICS", "REPORT_CHUNKS_FAILED", "requestId=$requestId error=${error.message ?: error.javaClass.simpleName}")</ID>
+    <ID>MaxLineLength:WatchWearListenerService.kt$WatchWearListenerService$EventHistoryStore.add(this, "DIAGNOSTICS", "REQUEST_RECEIVED", "requestId=$requestId node=${event.sourceNodeId}")</ID>
+    <ID>MaxLineLength:WatchWearListenerService.kt$WatchWearListenerService$EventHistoryStore.add(this, "DND_SETUP", "OPEN_ACTIVITY_FAILED", error.message ?: error.javaClass.simpleName)</ID>
+    <ID>MaxLineLength:WatchWearListenerService.kt$WatchWearListenerService$WearTransport</ID>
+    <ID>MaxLineLength:WatchWearListenerService.kt$WatchWearListenerService$append("DND notification listener access: ").append(WatchDndPermissionState.snapshot(this@WatchWearListenerService).notificationListenerGranted).append('\n')</ID>
+    <ID>MaxLineLength:WatchWearListenerService.kt$WatchWearListenerService$append("Sound controller: ").append(SoundController.diagnosticState(this@WatchWearListenerService)).append('\n')</ID>
+    <ID>MaxLineLength:WatchWearListenerService.kt$WatchWearListenerService$append("Watch app version: ").append(BuildConfig.VERSION_NAME).append(" (code ").append(BuildConfig.VERSION_CODE).append(")\n")</ID>
+    <ID>MaxLineLength:WatchWearListenerService.kt$WatchWearListenerService$val dndBlocked = respectDnd &amp;&amp; getSystemService(NotificationManager::class.java).currentInterruptionFilter != NotificationManager.INTERRUPTION_FILTER_ALL</ID>
+    <ID>MaxLineLength:WatchWearListenerService.kt$WatchWearListenerService$val writeSecureSettings = checkCallingOrSelfPermission("android.permission.WRITE_SECURE_SETTINGS") == android.content.pm.PackageManager.PERMISSION_GRANTED</ID>
+    <ID>PackageNaming:AlarmActivity.kt$package com.h_ide4pda.wakemywatch.watch.alarm</ID>
+    <ID>PackageNaming:AlarmAlertController.kt$package com.h_ide4pda.wakemywatch.watch.alarm</ID>
+    <ID>PackageNaming:AlarmSessionStore.kt$package com.h_ide4pda.wakemywatch.watch.alarm</ID>
+    <ID>PackageNaming:MirrorNotifier.kt$package com.h_ide4pda.wakemywatch.watch.mirror</ID>
+    <ID>PackageNaming:OffBodyStateMonitor.kt$package com.h_ide4pda.wakemywatch.watch.sensors</ID>
+    <ID>PackageNaming:SoundController.kt$package com.h_ide4pda.wakemywatch.watch.sound</ID>
+    <ID>PackageNaming:WakeActivity.kt$package com.h_ide4pda.wakemywatch.watch.wake</ID>
+    <ID>PackageNaming:WakeController.kt$package com.h_ide4pda.wakemywatch.watch.wake</ID>
+    <ID>PackageNaming:WakeMyWatchApplication.kt$package com.h_ide4pda.wakemywatch.watch</ID>
+    <ID>PackageNaming:WatchDndPermissionState.kt$package com.h_ide4pda.wakemywatch.watch.dnd</ID>
+    <ID>PackageNaming:WatchDndSyncBridge.kt$package com.h_ide4pda.wakemywatch.watch.dnd</ID>
+    <ID>PackageNaming:WatchDndSyncNotificationService.kt$package com.h_ide4pda.wakemywatch.watch.dnd</ID>
+    <ID>PackageNaming:WatchLookAtPhoneScreen.kt$package com.h_ide4pda.wakemywatch.watch.ui</ID>
+    <ID>PackageNaming:WatchMainActivity.kt$package com.h_ide4pda.wakemywatch.watch</ID>
+    <ID>PackageNaming:WatchRingerModeWatcher.kt$package com.h_ide4pda.wakemywatch.watch.ringer</ID>
+    <ID>PackageNaming:WatchRingerSyncBridge.kt$package com.h_ide4pda.wakemywatch.watch.ringer</ID>
+    <ID>PackageNaming:WatchTheme.kt$package com.h_ide4pda.wakemywatch.watch.ui</ID>
+    <ID>PackageNaming:WatchWearListenerService.kt$package com.h_ide4pda.wakemywatch.watch.wear</ID>
+    <ID>ReturnCount:AlarmActivity.kt$AlarmActivity$private fun handleActionResult(intent: Intent)</ID>
+    <ID>ReturnCount:AlarmActivity.kt$private fun alarmSubtitle(context: Context, session: AlarmSession): String</ID>
+    <ID>ReturnCount:AlarmSessionStore.kt$AlarmSession.Companion$fun fromJson(json: JSONObject): AlarmSession?</ID>
+    <ID>ReturnCount:AlarmSessionStore.kt$AlarmSession.Companion$fun fromPayload(payload: JSONObject): AlarmSession?</ID>
+    <ID>ReturnCount:AlarmSessionStore.kt$AlarmSessionStore$fun clear(context: Context, expectedEventId: String? = null): Boolean</ID>
+    <ID>ReturnCount:OffBodyStateMonitor.kt$OffBodyStateMonitor$fun isOffWrist(context: Context, requiresLock: Boolean): Boolean</ID>
+    <ID>ReturnCount:WakeController.kt$WakeController$@Suppress("DEPRECATION") fun wake(context: Context, eventId: String): Result</ID>
+    <ID>ReturnCount:WatchDndSyncBridge.kt$WatchDndSyncBridge$fun applyIncomingFromPhone(context: Context, envelope: MessageEnvelope): Pair&lt;String, String&gt;</ID>
+    <ID>ReturnCount:WatchMainActivity.kt$WatchMainActivity$private fun maybeRequestPostNotificationsForAlarmBridge()</ID>
+    <ID>ReturnCount:WatchRingerSyncBridge.kt$WatchRingerSyncBridge$fun applyIncomingFromPhone(context: Context, envelope: MessageEnvelope): Pair&lt;String, String&gt;</ID>
+    <ID>ReturnCount:WatchRingerSyncBridge.kt$WatchRingerSyncBridge$fun onWatchRingerModeChanged(context: Context, mode: Int)</ID>
+    <ID>ReturnCount:WatchWearListenerService.kt$WatchWearListenerService$override fun onMessageReceived(event: MessageEvent)</ID>
+    <ID>SwallowedException:WatchWearListenerService.kt$WatchWearListenerService$error: SecurityException</ID>
+    <ID>TooManyFunctions:AlarmActivity.kt$AlarmActivity$Companion</ID>
+    <ID>TooManyFunctions:WatchMainActivity.kt$com.h_ide4pda.wakemywatch.watch.WatchMainActivity.kt</ID>
+    <ID>TooManyFunctions:WatchWearListenerService.kt$WatchWearListenerService : WearableListenerService</ID>
+    <ID>UnusedParameter:AlarmActivity.kt$AlarmActivity.Companion$session: AlarmSession</ID>
+    <ID>WildcardImport:WatchMainActivity.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:WatchMainActivity.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:WatchMainActivity.kt$import androidx.wear.compose.material.*</ID>
+    <ID>WildcardImport:WatchMainActivity.kt$import com.h_ide4pda.wakemywatch.core.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

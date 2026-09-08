@@ -1,0 +1,283 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:AlarmBridgeController.kt$AlarmBridgeController$private fun extractActions(sbn: StatusBarNotification): ExtractedActions</ID>
+    <ID>CyclomaticComplexMethod:NotificationRelayService.kt$NotificationRelayService$override fun onNotificationPosted(sbn: StatusBarNotification)</ID>
+    <ID>CyclomaticComplexMethod:NotificationRelayService.kt$NotificationRelayService$private fun verifyAndForward(candidate: PendingForward)</ID>
+    <ID>CyclomaticComplexMethod:PhoneMainActivity.kt$@Composable private fun DndDialog( settings: PhoneSettings, onSettings: (PhoneSettings) -&gt; Unit, onOpenAdbGuide: () -&gt; Unit, onDismiss: () -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:PhoneMainActivity.kt$@Composable private fun PermissionsScreen( modifier: Modifier, snapshot: PermissionProbe.Snapshot, ringerSyncEnabled: Boolean, onBack: () -&gt; Unit, onRefresh: () -&gt; Unit, onNotificationListener: () -&gt; Unit, onPostNotifications: () -&gt; Unit, onAppNotificationSettings: () -&gt; Unit, onDndPolicy: () -&gt; Unit, onBattery: () -&gt; Unit, onExactAlarm: () -&gt; Unit, onAppDetails: () -&gt; Unit, onShareAdbGuideHtml: () -&gt; Unit, onCheckWatch: () -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:PhoneMainActivity.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun PhoneApp(refreshToken: Int)</ID>
+    <ID>CyclomaticComplexMethod:PhoneWearListenerService.kt$PhoneWearListenerService$override fun onMessageReceived(event: MessageEvent)</ID>
+    <ID>CyclomaticComplexMethod:RingerScheduleController.kt$RingerScheduleController$private fun nextEdgeMillis(plans: List&lt;RingerSchedulePlan&gt;): Long?</ID>
+    <ID>ForbiddenComment:PhoneMainActivity.kt$// TODO: вставить реальные ссылки/адрес</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun &lt;T&gt; ChoiceDialog(title: String, options: List&lt;Pair&lt;T, String&gt;&gt;, selected: T, onSelect: (T) -&gt; Unit, onDismiss: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun ActionCard(icon: ImageVector, title: String, summary: String, onClick: () -&gt; Unit, tint: Color = WmwBlue)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun AppFilterScreen(modifier: Modifier, settings: PhoneSettings, onSettings: (PhoneSettings) -&gt; Unit, onBack: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun DayCircles(days: Int, onToggle: (Int, Boolean) -&gt; Unit)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun DetailRow(label: String, value: String?)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun DeviceCard( remote: DeviceDescriptor?, ack: Pair&lt;Long, String&gt;, connected: Boolean, onClick: (() -&gt; Unit)? = null, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun DeviceInfoScreen(modifier: Modifier, remote: DeviceDescriptor?, ack: Pair&lt;Long, String&gt;, connection: ConnectionSnapshot, onBack: () -&gt; Unit, onResync: () -&gt; Unit, onLegal: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun DiagnosticExportButton( enabled: Boolean, events: List&lt;EventHistoryStore.Entry&gt;, onToast: (String) -&gt; Unit, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun DiagnosticsScreen( modifier: Modifier, settings: PhoneSettings, remote: DeviceDescriptor?, ack: Pair&lt;Long, String&gt;, connection: ConnectionSnapshot, onBack: () -&gt; Unit, onExpandHistory: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun DividerLine()</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun DndDialog( settings: PhoneSettings, onSettings: (PhoneSettings) -&gt; Unit, onOpenAdbGuide: () -&gt; Unit, onDismiss: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun EventHistoryCard(entry: EventHistoryStore.Entry)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun EventHistoryScreen( modifier: Modifier, onBack: () -&gt; Unit, onToast: (String) -&gt; Unit, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun FilterModeRow(label: String, mode: AppFilterMode, settings: PhoneSettings, onSettings: (PhoneSettings) -&gt; Unit)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun Footer(onLegal: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun MainScreen( modifier: Modifier, settings: PhoneSettings, remote: DeviceDescriptor?, ack: Pair&lt;Long, String&gt;, connection: ConnectionSnapshot, offBodySupported: Boolean, nativeOHealthPhone: Boolean, onSettings: (PhoneSettings) -&gt; Unit, onPauseSettings: () -&gt; Unit, onSound: () -&gt; Unit, onRingerSyncToggle: (Boolean) -&gt; Unit, onRingerSchedule: () -&gt; Unit, onWrist: () -&gt; Unit, onSilent: () -&gt; Unit, onDnd: () -&gt; Unit, onAppFilter: () -&gt; Unit, onAlarmBridge: () -&gt; Unit, onDevice: () -&gt; Unit, onPermissions: () -&gt; Unit, onDiagnostics: () -&gt; Unit, onDonate: () -&gt; Unit, onLegal: () -&gt; Unit, onGrant: () -&gt; Unit, onTest: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun ManualInstructionSection( title: String, expanded: Boolean, onExpanded: () -&gt; Unit, body: String, alwaysExpanded: Boolean = false, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun ManualSetupCard(snapshot: PermissionProbe.Snapshot, onAppDetails: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun PageHeader(title: String, onBack: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun PauseCard( paused: Boolean, keepsAlarmAndDnd: Boolean, onToggle: (Boolean) -&gt; Unit, onSettingsClick: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun PauseSettingsDialog(settings: PhoneSettings, onSettings: (PhoneSettings) -&gt; Unit, onDismiss: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun PermissionStatusRow( icon: ImageVector, title: String, ok: Boolean, okText: String, badText: String, actionText: String, enabled: Boolean = true, onAction: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun PermissionsScreen( modifier: Modifier, snapshot: PermissionProbe.Snapshot, ringerSyncEnabled: Boolean, onBack: () -&gt; Unit, onRefresh: () -&gt; Unit, onNotificationListener: () -&gt; Unit, onPostNotifications: () -&gt; Unit, onAppNotificationSettings: () -&gt; Unit, onDndPolicy: () -&gt; Unit, onBattery: () -&gt; Unit, onExactAlarm: () -&gt; Unit, onAppDetails: () -&gt; Unit, onShareAdbGuideHtml: () -&gt; Unit, onCheckWatch: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun ReadOnlySwitchDialogRow(label: String, checked: Boolean)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun RingerSchedulePlanScreen( modifier: Modifier, original: RingerSchedulePlan?, onBack: () -&gt; Unit, onSave: (RingerSchedulePlan) -&gt; Unit, onDelete: (() -&gt; Unit)?, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun RingerScheduleTimeRow( label: String, minutes: Int, enabled: Boolean, onPicked: (Int) -&gt; Unit, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun RingerSchedulesScreen( modifier: Modifier, plans: List&lt;RingerSchedulePlan&gt;, onBack: () -&gt; Unit, onTogglePlan: (String, Boolean) -&gt; Unit, onEditPlan: (String) -&gt; Unit, onAddPlan: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun SettingRow( icon: ImageVector, title: String, summary: String, trailing: @Composable (() -&gt; Unit)? = null, enabled: Boolean = true, onClick: (() -&gt; Unit)? = null, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun SettingsPanel(content: @Composable ColumnScope.() -&gt; Unit)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun SilentNotificationsDialog(settings: PhoneSettings, onSettings: (PhoneSettings) -&gt; Unit, onDismiss: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun SoundModeDialog( settings: PhoneSettings, onSettings: (PhoneSettings) -&gt; Unit, onDismiss: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun SwitchDialogRow(label: String, checked: Boolean, onChecked: (Boolean) -&gt; Unit)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun WatchPermInfoRow(text: String)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun WatchPermissionsPanel( status: DndSyncStatus?, loading: Boolean, ringerSyncEnabled: Boolean, )</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@Composable private fun WristDialog(settings: PhoneSettings, onSettings: (PhoneSettings) -&gt; Unit, onDismiss: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:PhoneMainActivity.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun PhoneApp(refreshToken: Int)</ID>
+    <ID>FunctionNaming:WmwTheme.kt$@Composable fun WakeMyWatchTheme(content: @Composable () -&gt; Unit)</ID>
+    <ID>LongMethod:DndAdbGuideContent.kt$DndAdbGuideContent$fun html(): String</ID>
+    <ID>LongMethod:NotificationRelayService.kt$NotificationRelayService$override fun onNotificationPosted(sbn: StatusBarNotification)</ID>
+    <ID>LongMethod:NotificationRelayService.kt$NotificationRelayService$private fun verifyAndForward(candidate: PendingForward)</ID>
+    <ID>LongMethod:PhoneMainActivity.kt$@Composable private fun AppFilterScreen(modifier: Modifier, settings: PhoneSettings, onSettings: (PhoneSettings) -&gt; Unit, onBack: () -&gt; Unit)</ID>
+    <ID>LongMethod:PhoneMainActivity.kt$@Composable private fun DiagnosticsScreen( modifier: Modifier, settings: PhoneSettings, remote: DeviceDescriptor?, ack: Pair&lt;Long, String&gt;, connection: ConnectionSnapshot, onBack: () -&gt; Unit, onExpandHistory: () -&gt; Unit, )</ID>
+    <ID>LongMethod:PhoneMainActivity.kt$@Composable private fun DndDialog( settings: PhoneSettings, onSettings: (PhoneSettings) -&gt; Unit, onOpenAdbGuide: () -&gt; Unit, onDismiss: () -&gt; Unit, )</ID>
+    <ID>LongMethod:PhoneMainActivity.kt$@Composable private fun MainScreen( modifier: Modifier, settings: PhoneSettings, remote: DeviceDescriptor?, ack: Pair&lt;Long, String&gt;, connection: ConnectionSnapshot, offBodySupported: Boolean, nativeOHealthPhone: Boolean, onSettings: (PhoneSettings) -&gt; Unit, onPauseSettings: () -&gt; Unit, onSound: () -&gt; Unit, onRingerSyncToggle: (Boolean) -&gt; Unit, onRingerSchedule: () -&gt; Unit, onWrist: () -&gt; Unit, onSilent: () -&gt; Unit, onDnd: () -&gt; Unit, onAppFilter: () -&gt; Unit, onAlarmBridge: () -&gt; Unit, onDevice: () -&gt; Unit, onPermissions: () -&gt; Unit, onDiagnostics: () -&gt; Unit, onDonate: () -&gt; Unit, onLegal: () -&gt; Unit, onGrant: () -&gt; Unit, onTest: () -&gt; Unit, )</ID>
+    <ID>LongMethod:PhoneMainActivity.kt$@Composable private fun ManualSetupCard(snapshot: PermissionProbe.Snapshot, onAppDetails: () -&gt; Unit)</ID>
+    <ID>LongMethod:PhoneMainActivity.kt$@Composable private fun PermissionsScreen( modifier: Modifier, snapshot: PermissionProbe.Snapshot, ringerSyncEnabled: Boolean, onBack: () -&gt; Unit, onRefresh: () -&gt; Unit, onNotificationListener: () -&gt; Unit, onPostNotifications: () -&gt; Unit, onAppNotificationSettings: () -&gt; Unit, onDndPolicy: () -&gt; Unit, onBattery: () -&gt; Unit, onExactAlarm: () -&gt; Unit, onAppDetails: () -&gt; Unit, onShareAdbGuideHtml: () -&gt; Unit, onCheckWatch: () -&gt; Unit, )</ID>
+    <ID>LongMethod:PhoneMainActivity.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun PhoneApp(refreshToken: Int)</ID>
+    <ID>LongMethod:PhoneMainActivity.kt$private fun buildCombinedDiagnosticZip( context: Context, initialEvents: List&lt;EventHistoryStore.Entry&gt;, ): ByteArray</ID>
+    <ID>LongMethod:PhoneWearListenerService.kt$PhoneWearListenerService$override fun onMessageReceived(event: MessageEvent)</ID>
+    <ID>LongParameterList:PhoneMainActivity.kt$( icon: ImageVector, title: String, ok: Boolean, okText: String, badText: String, actionText: String, enabled: Boolean = true, onAction: () -&gt; Unit, )</ID>
+    <ID>LongParameterList:PhoneMainActivity.kt$( icon: ImageVector, title: String, summary: String, trailing: @Composable (() -&gt; Unit)? = null, enabled: Boolean = true, onClick: (() -&gt; Unit)? = null, )</ID>
+    <ID>LongParameterList:PhoneMainActivity.kt$( modifier: Modifier, plans: List&lt;RingerSchedulePlan&gt;, onBack: () -&gt; Unit, onTogglePlan: (String, Boolean) -&gt; Unit, onEditPlan: (String) -&gt; Unit, onAddPlan: () -&gt; Unit, )</ID>
+    <ID>LongParameterList:PhoneMainActivity.kt$( modifier: Modifier, settings: PhoneSettings, remote: DeviceDescriptor?, ack: Pair&lt;Long, String&gt;, connection: ConnectionSnapshot, offBodySupported: Boolean, nativeOHealthPhone: Boolean, onSettings: (PhoneSettings) -&gt; Unit, onPauseSettings: () -&gt; Unit, onSound: () -&gt; Unit, onRingerSyncToggle: (Boolean) -&gt; Unit, onRingerSchedule: () -&gt; Unit, onWrist: () -&gt; Unit, onSilent: () -&gt; Unit, onDnd: () -&gt; Unit, onAppFilter: () -&gt; Unit, onAlarmBridge: () -&gt; Unit, onDevice: () -&gt; Unit, onPermissions: () -&gt; Unit, onDiagnostics: () -&gt; Unit, onDonate: () -&gt; Unit, onLegal: () -&gt; Unit, onGrant: () -&gt; Unit, onTest: () -&gt; Unit, )</ID>
+    <ID>LongParameterList:PhoneMainActivity.kt$( modifier: Modifier, settings: PhoneSettings, remote: DeviceDescriptor?, ack: Pair&lt;Long, String&gt;, connection: ConnectionSnapshot, onBack: () -&gt; Unit, onExpandHistory: () -&gt; Unit, )</ID>
+    <ID>LongParameterList:PhoneMainActivity.kt$( modifier: Modifier, snapshot: PermissionProbe.Snapshot, ringerSyncEnabled: Boolean, onBack: () -&gt; Unit, onRefresh: () -&gt; Unit, onNotificationListener: () -&gt; Unit, onPostNotifications: () -&gt; Unit, onAppNotificationSettings: () -&gt; Unit, onDndPolicy: () -&gt; Unit, onBattery: () -&gt; Unit, onExactAlarm: () -&gt; Unit, onAppDetails: () -&gt; Unit, onShareAdbGuideHtml: () -&gt; Unit, onCheckWatch: () -&gt; Unit, )</ID>
+    <ID>LongParameterList:PhoneMainActivity.kt$(modifier: Modifier, remote: DeviceDescriptor?, ack: Pair&lt;Long, String&gt;, connection: ConnectionSnapshot, onBack: () -&gt; Unit, onResync: () -&gt; Unit, onLegal: () -&gt; Unit)</ID>
+    <ID>LongParameterList:PhoneWearListenerService.kt$PhoneWearListenerService$( nodeId: String, requestId: String, alarmEventId: String, actionName: String, result: String, detail: String, )</ID>
+    <ID>MagicNumber:AlarmBridgeController.kt$AlarmBridgeController$80</ID>
+    <ID>MagicNumber:NotificationDeduplicator.kt$NotificationDeduplicator$12</ID>
+    <ID>MagicNumber:NotificationDeduplicator.kt$NotificationDeduplicator$60_000</ID>
+    <ID>MagicNumber:NotificationDeduplicator.kt$NotificationDeduplicator$750</ID>
+    <ID>MagicNumber:NotificationRelayService.kt$NotificationRelayService$8</ID>
+    <ID>MagicNumber:NotificationRelayService.kt$NotificationRelayService.NotificationSnapshot$16</ID>
+    <ID>MagicNumber:PhoneDndSyncBridge.kt$PhoneDndSyncBridge$6</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$.45f</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$.48f</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$.55f</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$0b0011111</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$0b1100000</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$0xFF261A28</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$0xFF2A1820</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$0xFF2A1F14</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$0xFF2B171B</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$0xFFFFB4AB</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$0xFFFFB74D</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$0xFFFFDAD6</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$4</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$40</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$5</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$6</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$60</ID>
+    <ID>MagicNumber:PhoneMainActivity.kt$8</ID>
+    <ID>MagicNumber:RingerScheduleController.kt$RingerScheduleController$24</ID>
+    <ID>MagicNumber:RingerScheduleController.kt$RingerScheduleController$4</ID>
+    <ID>MagicNumber:RingerScheduleController.kt$RingerScheduleController$5</ID>
+    <ID>MagicNumber:RingerScheduleController.kt$RingerScheduleController$6</ID>
+    <ID>MagicNumber:RingerScheduleController.kt$RingerScheduleController$60</ID>
+    <ID>MagicNumber:RingerScheduleController.kt$RingerScheduleController$7</ID>
+    <ID>MagicNumber:RingerSyncBridge.kt$RingerSyncBridge$6</ID>
+    <ID>MagicNumber:WmwTheme.kt$0xFF00C2FF</ID>
+    <ID>MagicNumber:WmwTheme.kt$0xFF00E676</ID>
+    <ID>MagicNumber:WmwTheme.kt$0xFF030B18</ID>
+    <ID>MagicNumber:WmwTheme.kt$0xFF081526</ID>
+    <ID>MagicNumber:WmwTheme.kt$0xFF0B1A2D</ID>
+    <ID>MagicNumber:WmwTheme.kt$0xFF7B61F6</ID>
+    <ID>MagicNumber:WmwTheme.kt$0xFFA9B4C8</ID>
+    <ID>MagicNumber:WmwTheme.kt$0xFFF6F8FF</ID>
+    <ID>MaxLineLength:AlarmBridgeController.kt$AlarmBridgeController$if</ID>
+    <ID>MaxLineLength:AlarmBridgeController.kt$AlarmBridgeController$null -&gt; ExtractedActions(snooze, dismiss, unsupportedAlarmActionsDetail(sbn.packageName, actionInfos))</ID>
+    <ID>MaxLineLength:NotificationDeduplicator.kt$NotificationDeduplicator$Seen</ID>
+    <ID>MaxLineLength:NotificationRelayService.kt$NotificationRelayService$"superseded_before_forward expectedPost=${candidate.expectedPostTime} activePost=${active.postTime} | ${candidate.snapshot.compactDetail}"</ID>
+    <ID>MaxLineLength:NotificationRelayService.kt$NotificationRelayService$EventHistoryStore.add(this, "RINGER_SYNC", "RECEIVER_REGISTER_FAILED", it.message ?: it.javaClass.simpleName)</ID>
+    <ID>MaxLineLength:NotificationRelayService.kt$NotificationRelayService$if (nothingToForward) "no_watch_reaction silent=${if (snapshot.isSilentLowImportance) 1 else 0}" else "app_filter"</ID>
+    <ID>MaxLineLength:NotificationRelayService.kt$NotificationRelayService$val</ID>
+    <ID>MaxLineLength:NotificationRelayService.kt$NotificationRelayService.NotificationSnapshot$!hasFullScreenIntent</ID>
+    <ID>MaxLineLength:NotificationRelayService.kt$NotificationRelayService.NotificationSnapshot$get</ID>
+    <ID>MaxLineLength:PermissionProbe.kt$PermissionProbe$ContextCompat.checkSelfPermission(app, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED</ID>
+    <ID>MaxLineLength:PermissionProbe.kt$PermissionProbe$nativeOHealthPhone = !AppSettingsStore.load(app).forceSoftwareDndSync &amp;&amp; isNativeOHealthPhone(manufacturer, brand)</ID>
+    <ID>MaxLineLength:PermissionProbe.kt$PermissionProbe$val dndPolicyAccessGranted = runCatching { notificationManager.isNotificationPolicyAccessGranted }.getOrDefault(false)</ID>
+    <ID>MaxLineLength:PermissionProbe.kt$PermissionProbe$val writeSecureSettingsGranted = app.checkCallingOrSelfPermission("android.permission.WRITE_SECURE_SETTINGS") == PackageManager.PERMISSION_GRANTED</ID>
+    <ID>MaxLineLength:PhoneDndSyncBridge.kt$PhoneDndSyncBridge$EventHistoryStore.add(context, "DND_SYNC", "CLEAR_DEFERRED", "watch_unreachable, will retry on next reconnect trigger=$trigger")</ID>
+    <ID>MaxLineLength:PhoneDndSyncBridge.kt$PhoneDndSyncBridge$EventHistoryStore.add(context, "DND_SYNC", "IGNORED_WATCH_TO_PHONE", "filter=$filter one_way_phone_to_watch_only")</ID>
+    <ID>MaxLineLength:PhoneDndSyncBridge.kt$PhoneDndSyncBridge$private</ID>
+    <ID>MaxLineLength:PhoneDndSyncBridge.kt$PhoneDndSyncBridge$val applied = clearWatchDndOnce(context, trigger, attempt = 1) || clearWatchDndOnce(context, trigger, attempt = 2)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$"${RingerScheduleController.hhmm(plan.startMinutes)} – ${RingerScheduleController.hhmm(plan.endMinutes)} · ${daysLabel(plan.days)}"</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$"×${entry.repeatCount} · ${dateTime.format(Date(entry.firstTime))} — ${dateTime.format(Date(entry.lastTime))}"</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$?:</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$ActionCard(Icons.AutoMirrored.Filled.Send, stringResource(R.string.test_wake), stringResource(R.string.test_wake_summary), onTest)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$ActionCard(Icons.Default.Refresh, stringResource(R.string.resync), stringResource(R.string.test_connection), onResync)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$ActionCard(Icons.Default.Search, stringResource(R.string.diagnostics), stringResource(R.string.diagnostics_summary), onDiagnostics)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$ActionCard(ImageVector.vectorResource(id = R.drawable.ic_admin_panel_settings), stringResource(R.string.permissions_and_background), stringResource(R.string.permissions_and_background_summary), onPermissions)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$ActionCard(ImageVector.vectorResource(id = R.drawable.ic_coffee), stringResource(R.string.donate_title), stringResource(R.string.donate_summary), onDonate, tint = WmwGreen)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Box</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Box(Modifier.size(8.dp).clip(RoundedCornerShape(8.dp)).background(if (connected) WmwGreen else WmwMuted))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$DetailRow(stringResource(R.string.connection), if (connection.isConnected(remote?.nodeId)) stringResource(R.string.connected) else stringResource(R.string.disconnected))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$DetailRow(stringResource(R.string.last_ack), connection.lastAckAt.takeIf { it &gt; 0 }?.let { "${DateFormat.getDateTimeInstance().format(Date(it))} · ${connection.lastAckResult}" } ?: ack.first.takeIf { it &gt; 0 }?.let { DateFormat.getDateTimeInstance().format(Date(it)) })</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$DetailRow(stringResource(R.string.last_handshake), connection.lastHandshakeAt.takeIf { it &gt; 0 }?.let { DateFormat.getDateTimeInstance().format(Date(it)) })</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$DetailRow(stringResource(R.string.last_transport), connection.lastSendAt.takeIf { it &gt; 0 }?.let { "${connection.lastSendResult} · ${connection.lastSendPath}" })</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$DetailRow(stringResource(R.string.notification_access), if (hasAccess) stringResource(R.string.granted) else stringResource(R.string.not_granted))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$DetailRow(stringResource(R.string.wear_os), remote?.let { "Wear OS / Android ${it.osRelease} (API ${it.sdkInt})" })</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$EventHistoryStore.add(context, "TEST_WAKE", if (result.success) "SENT" else "FAILED", result.detail)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Icon(ImageVector.vectorResource(id = R.drawable.ic_file_download), contentDescription = null, modifier = Modifier.size(18.dp))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Icon(ImageVector.vectorResource(id = R.drawable.ic_open_in_full), contentDescription = null, modifier = Modifier.size(18.dp))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Icon(ImageVector.vectorResource(id = R.drawable.ic_pause_circle), null, tint = if (paused) Color(0xFFFFB74D) else WmwMuted, modifier = Modifier.size(30.dp))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Icon(ImageVector.vectorResource(id = R.drawable.ic_watch), null, tint = WmwBlue, modifier = Modifier.size(38.dp))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$IconButton(onClick = onLegal, modifier = Modifier.size(32.dp)) { Icon(Icons.Default.Info, stringResource(R.string.about_title), tint = WmwPurple) }</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Modifier.fillMaxWidth().clickable { onEditPlan(plan.id) }.padding(horizontal = 16.dp, vertical = 12.dp)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Modifier.fillMaxWidth().clickable { onSettings(settings.copy(appFilterMode = mode)) }.padding(horizontal = 12.dp, vertical = 8.dp)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Modifier.fillMaxWidth().clickable { onSettings(settings.copy(soundMode = value)) }.padding(vertical = 7.dp)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Modifier.fillMaxWidth().then(clickModifier).alpha(if (enabled) 1f else .48f).padding(horizontal = 16.dp, vertical = 14.dp)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Page</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$PhoneMainActivity$"version=${BuildConfig.VERSION_NAME} device=${Build.MANUFACTURER} ${Build.MODEL} android=${Build.VERSION.RELEASE} api=${Build.VERSION.SDK_INT}"</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$PhoneMainActivity$EventHistoryStore.add(this, "SETTINGS_SNAPSHOT", "app_start", SettingsAudit.snapshot(PhoneSettingsStore.load(this)))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$RadioButton(selected = value == settings.soundMode, onClick = { onSettings(settings.copy(soundMode = value)) })</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Row</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$SettingRow(ImageVector.vectorResource(id = R.drawable.ic_volume_up), stringResource(R.string.sound_mode), soundModeLabel(settings), onClick = onSound)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$SwitchDialogRow</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Text(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM).format(Date(entry.time)), color = WmwMuted, fontSize = 11.sp)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Text(app.packageName, color = WmwMuted, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Text(if (connected) stringResource(R.string.connected) else stringResource(R.string.disconnected), color = if (connected) WmwGreen else WmwMuted)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Text(remote?.headline ?: stringResource(R.string.searching_watch), fontWeight = FontWeight.Bold, fontSize = 19.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Text(stringResource(R.string.about_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Text(stringResource(R.string.donate_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Text(stringResource(R.string.event_history), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Text(stringResource(R.string.manual_setup_title), fontWeight = FontWeight.Bold, color = Color(0xFFFFDAD6))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Text(stringResource(R.string.no_events), color = WmwMuted, modifier = Modifier.padding(vertical = 24.dp))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Text(stringResource(R.string.privacy_line), color = WmwMuted, fontSize = 12.sp, modifier = Modifier.align(Alignment.CenterHorizontally))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Text(stringResource(R.string.silent_notifications_intro), color = WmwMuted, fontSize = 13.sp, lineHeight = 18.sp)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Text(stringResource(R.string.silent_notifications_ohealth_note), color = WmwMuted, fontSize = 13.sp, lineHeight = 18.sp)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Text(stringResource(R.string.silent_vibrate_summary), color = WmwMuted, fontSize = 13.sp, lineHeight = 18.sp)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$Text(stringResource(R.string.silent_wake_screen_summary), color = WmwMuted, fontSize = 13.sp, lineHeight = 18.sp)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$actionText = if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.TIRAMISU) stringResource(R.string.grant_access) else stringResource(R.string.open_settings)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$append("App: ").append(BuildConfig.VERSION_NAME).append(" (code ").append(BuildConfig.VERSION_CODE).append(")\n\n")</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$append("Phone app version: ").append(BuildConfig.VERSION_NAME).append(" (code ").append(BuildConfig.VERSION_CODE).append(")\n")</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$append("This package contains Wake My Watch's own phone/watch logs. It does not contain full Android logcat, OHealth internals or a system bugreport.\n")</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$border = BorderStroke(1.dp, if (snapshot.criticalIssues &gt; 0) Color(0xFFFFB4AB).copy(alpha = .5f) else WmwBlue.copy(alpha = .24f))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$color = if (entry.result.contains("FAILED") || entry.result == "SKIPPED") Color(0xFFFFB4AB) else WmwBlue</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$connection.lastAckAt.takeIf { it &gt; 0 }?.let { "${DateFormat.getDateTimeInstance().format(Date(it))} · ${connection.lastAckResult}" }</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$dismissButton = { TextButton(onClick = { showAlarmWarning = false }) { Text(stringResource(R.string.cancel)) } }</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$if (!alwaysExpanded) Icon(if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null, tint = WmwMuted)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$if (ack.first &gt; 0) Text("${stringResource(R.string.last_ack)}: ${DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(ack.first))}", color = WmwMuted, fontSize = 12.sp)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$if (days and RingerSchedulePlan.ALL_DAYS == RingerSchedulePlan.ALL_DAYS) return stringResource(R.string.ringer_schedule_days_every)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$if (dndSyncStatusValue == 1) R.string.dnd_sync_status_active else R.string.dnd_sync_status_inactive</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$if (paused) stringResource(R.string.app_paused_status_on) else stringResource(R.string.app_paused_status_off)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$if (settings.appFilterMode == AppFilterMode.ALL) stringResource(R.string.filter_all_note) else stringResource(R.string.selected_apps_count, settings.appPackages.size)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$if (snapshot.criticalIssues &gt; 0) stringResource(R.string.permissions_attention_required) else stringResource(R.string.permissions_basic_ready)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$modifier</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$okText = if (snapshot.exactAlarmAllowed == null) stringResource(R.string.not_available) else stringResource(R.string.granted)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$okText = if (snapshot.nativeOHealthPhone) stringResource(R.string.disabled_native_ohealth) else stringResource(R.string.granted)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$onAction = if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.TIRAMISU) onPostNotifications else onAppNotificationSettings</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$private</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$startActivity(Intent.createChooser(intent, "Wake My Watch ADB guide HTML").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$stringResource(R.string.permissions_phone_detected, snapshot.manufacturer, snapshot.model, snapshot.androidRelease, snapshot.sdkInt)</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$update(settings.copy(ringerSchedulePlans = settings.ringerSchedulePlans.filterNot { it.id == plan.id }))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://4pda.to/forum/index.php?showuser=4077878"))</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$watchDndFilterLoading || watchDndFilter == null -&gt; R.string.dnd_sync_status_checking</ID>
+    <ID>MaxLineLength:PhoneMainActivity.kt$zip.putText("watch-unavailable.txt", watchFetch.error ?: "Watch diagnostics were not received before timeout.")</ID>
+    <ID>MaxLineLength:PhoneWearListenerService.kt$PhoneWearListenerService$"value=$value filter=$currentInterruptionFilter listener=${status.watchNotificationListenerGranted} dndPolicy=${status.watchDndPolicyAccessGranted} post=${status.watchPostNotificationsGranted}"</ID>
+    <ID>MaxLineLength:PhoneWearListenerService.kt$PhoneWearListenerService$.</ID>
+    <ID>MaxLineLength:PhoneWearListenerService.kt$PhoneWearListenerService$EventHistoryStore.add(this, "DIAGNOSTICS", "REJECTED", "invalid_channel requestId=$requestId node=${channel.nodeId}")</ID>
+    <ID>MaxLineLength:PhoneWearListenerService.kt$PhoneWearListenerService$EventHistoryStore.add(this, "DIAGNOSTICS", "WATCH_REPORT_CHANNEL_FAILED", "requestId=$requestId error=$detail fallback=message_chunks")</ID>
+    <ID>MaxLineLength:PhoneWearListenerService.kt$PhoneWearListenerService$EventHistoryStore.add(this, "DIAGNOSTICS", "WATCH_REPORT_CHANNEL_FAILED", "requestId=$requestId error=$error fallback=message_chunks")</ID>
+    <ID>MaxLineLength:PhoneWearListenerService.kt$PhoneWearListenerService$EventHistoryStore.add(this, "DND_SETUP", "ADB_GUIDE_OPEN_FAILED", error.message ?: error.javaClass.simpleName)</ID>
+    <ID>MaxLineLength:PhoneWearListenerService.kt$PhoneWearListenerService$EventHistoryStore.add(this, "DND_SETUP", "ADB_GUIDE_OPEN_PHONE", envelope.payload.optString("reason", "watch_request"))</ID>
+    <ID>MaxLineLength:PhoneWearListenerService.kt$PhoneWearListenerService$val resolved = PauseModeTransition.resolve(previous, incoming, PermissionProbe.snapshot(this).nativeOHealthPhone)</ID>
+    <ID>MaxLineLength:PhoneWearListenerService.kt$PhoneWearListenerService$watchNotificationListenerGranted = envelope.payload.optBoolean("watchNotificationListenerGranted", false)</ID>
+    <ID>MaxLineLength:RingerScheduleController.kt$RingerScheduleController$"already_applied trigger=$trigger time=${hhmm(nowMinutes)} mode=${RingerSync.name(target)} plans=[$planLabel]"</ID>
+    <ID>MaxLineLength:RingerScheduleController.kt$RingerScheduleController$"phone_silent trigger=$trigger time=${hhmm(nowMinutes)} wanted=${RingerSync.name(target)} plans=[$planLabel]"</ID>
+    <ID>MaxLineLength:RingerScheduleController.kt$RingerScheduleController$"trigger=$trigger next=${dayName(mondayZero(edgeCal))} ${hhmm(edgeCal.get(Calendar.HOUR_OF_DAY) * 60 + edgeCal.get(Calendar.MINUTE))} inMs=${nextAt - System.currentTimeMillis()} exact=$exact"</ID>
+    <ID>MaxLineLength:RingerScheduleController.kt$RingerScheduleController$"trigger=$trigger plans=${plans.size} enabled=${plans.count { it.enabled }} paused=${settings.isFullyPaused}"</ID>
+    <ID>MaxLineLength:RingerScheduleController.kt$RingerScheduleController$"trigger=$trigger time=${hhmm(nowMinutes)} day=${dayName(dayMon0)} mode=${RingerSync.name(target)} previous=${RingerSync.name(current)} plans=[$planLabel]"</ID>
+    <ID>MaxLineLength:RingerSyncBridge.kt$RingerSyncBridge$"source=$source mode=${RingerSync.name(mode)} previous=${current?.let(RingerSync::name) ?: "unknown"} readback=${RingerSync.name(readback)}"</ID>
+    <ID>MaxLineLength:RingerSyncBridge.kt$RingerSyncBridge$EventHistoryStore.add(context, "RINGER_SYNC", "SKIPPED", "${RingerSync.SKIP_REVERSE_DISABLED} source=$source mode=${RingerSync.name(mode)}")</ID>
+    <ID>MaxLineLength:RingerSyncBridge.kt$RingerSyncBridge$EventHistoryStore.add(context, "RINGER_SYNC", "SKIPPED", "already_applied_phone source=$source mode=${RingerSync.name(mode)}")</ID>
+    <ID>MaxLineLength:RingerSyncBridge.kt$RingerSyncBridge$EventHistoryStore.add(context, "RINGER_SYNC", "SKIPPED", "app_paused source=$source mode=${RingerSync.name(mode)}")</ID>
+    <ID>MaxLineLength:RingerSyncBridge.kt$RingerSyncBridge$EventHistoryStore.add(context, "RINGER_SYNC", "SKIPPED", "disabled_incoming source=$source mode=${RingerSync.name(mode)}")</ID>
+    <ID>MaxLineLength:RingerSyncBridge.kt$RingerSyncBridge$EventHistoryStore.add(context, "RINGER_SYNC", "SKIPPED", "disabled_phone_change mode=${RingerSync.name(mode)}")</ID>
+    <ID>MaxLineLength:RingerSyncBridge.kt$RingerSyncBridge$EventHistoryStore.add(context, "RINGER_SYNC", "SKIPPED", "phone_policy_access_missing source=$source mode=SILENT")</ID>
+    <ID>MaxLineLength:WakeRateLimiter.kt$WakeRateLimiter$reason = "global_wake_cooldown source=${lastGlobalWakePackage.orEmpty()} remainingMs=${ALERT_COOLDOWN_MS - elapsed}"</ID>
+    <ID>NestedBlockDepth:RingerScheduleController.kt$RingerScheduleController$private fun nextEdgeMillis(plans: List&lt;RingerSchedulePlan&gt;): Long?</ID>
+    <ID>PackageNaming:AlarmBridgeController.kt$package com.h_ide4pda.wakemywatch.phone.alarm</ID>
+    <ID>PackageNaming:DndAdbGuideContent.kt$package com.h_ide4pda.wakemywatch.phone.adb</ID>
+    <ID>PackageNaming:NotificationDeduplicator.kt$package com.h_ide4pda.wakemywatch.phone.notifications</ID>
+    <ID>PackageNaming:NotificationRelayService.kt$package com.h_ide4pda.wakemywatch.phone.notifications</ID>
+    <ID>PackageNaming:PendingDndClear.kt$package com.h_ide4pda.wakemywatch.phone.dnd</ID>
+    <ID>PackageNaming:PermissionProbe.kt$package com.h_ide4pda.wakemywatch.phone.permissions</ID>
+    <ID>PackageNaming:PhoneDiagnosticsChunkAssembler.kt$package com.h_ide4pda.wakemywatch.phone.wear</ID>
+    <ID>PackageNaming:PhoneDiagnosticsTransfer.kt$package com.h_ide4pda.wakemywatch.phone.wear</ID>
+    <ID>PackageNaming:PhoneDndSyncAckTransfer.kt$package com.h_ide4pda.wakemywatch.phone.wear</ID>
+    <ID>PackageNaming:PhoneDndSyncBridge.kt$package com.h_ide4pda.wakemywatch.phone.dnd</ID>
+    <ID>PackageNaming:PhoneDndSyncStatusTransfer.kt$package com.h_ide4pda.wakemywatch.phone.wear</ID>
+    <ID>PackageNaming:PhoneInteractionState.kt$package com.h_ide4pda.wakemywatch.phone.notifications</ID>
+    <ID>PackageNaming:PhoneMainActivity.kt$package com.h_ide4pda.wakemywatch.phone</ID>
+    <ID>PackageNaming:PhoneSettings.kt$package com.h_ide4pda.wakemywatch.phone.settings</ID>
+    <ID>PackageNaming:PhoneWearListenerService.kt$package com.h_ide4pda.wakemywatch.phone.wear</ID>
+    <ID>PackageNaming:RingerScheduleController.kt$package com.h_ide4pda.wakemywatch.phone.ringer</ID>
+    <ID>PackageNaming:RingerScheduleReceiver.kt$package com.h_ide4pda.wakemywatch.phone.ringer</ID>
+    <ID>PackageNaming:RingerSyncBridge.kt$package com.h_ide4pda.wakemywatch.phone.ringer</ID>
+    <ID>PackageNaming:WakeRateLimiter.kt$package com.h_ide4pda.wakemywatch.phone.notifications</ID>
+    <ID>PackageNaming:WmwTheme.kt$package com.h_ide4pda.wakemywatch.phone.ui</ID>
+    <ID>ReturnCount:AlarmBridgeController.kt$AlarmBridgeController$fun register(context: Context, sbn: StatusBarNotification): Registration</ID>
+    <ID>ReturnCount:AlarmBridgeController.kt$AlarmBridgeController$private fun classify(action: Notification.Action, normalizedTitle: String): Action?</ID>
+    <ID>ReturnCount:AlarmBridgeController.kt$AlarmBridgeController$private fun extractActions(sbn: StatusBarNotification): ExtractedActions</ID>
+    <ID>ReturnCount:AlarmBridgeController.kt$AlarmBridgeController$private fun rebuild(context: Context, eventId: String): Registered?</ID>
+    <ID>ReturnCount:NotificationDeduplicator.kt$NotificationDeduplicator$fun shouldSkip(sbn: StatusBarNotification, now: Long = System.currentTimeMillis()): Pair&lt;Boolean, String&gt;</ID>
+    <ID>ReturnCount:NotificationRelayService.kt$NotificationRelayService$override fun onNotificationPosted(sbn: StatusBarNotification)</ID>
+    <ID>ReturnCount:NotificationRelayService.kt$NotificationRelayService$private fun mirrorContent(sbn: StatusBarNotification, snapshot: NotificationSnapshot): JSONObject?</ID>
+    <ID>ReturnCount:NotificationRelayService.kt$NotificationRelayService$private fun relayAlarmIfHandled(sbn: StatusBarNotification): Boolean</ID>
+    <ID>ReturnCount:NotificationRelayService.kt$NotificationRelayService$private fun verifyAndForward(candidate: PendingForward)</ID>
+    <ID>ReturnCount:PhoneDiagnosticsChunkAssembler.kt$PhoneDiagnosticsChunkAssembler$@Synchronized fun receive( requestId: String, index: Int, totalChunks: Int, encoding: String, data: String, ): Progress</ID>
+    <ID>ReturnCount:PhoneDndSyncBridge.kt$PhoneDndSyncBridge$fun onLocalInterruptionFilterChanged(context: Context, interruptionFilter: Int)</ID>
+    <ID>ReturnCount:PhoneMainActivity.kt$@Composable private fun daysLabel(days: Int): String</ID>
+    <ID>ReturnCount:PhoneMainActivity.kt$private fun requestWatchDndSyncStatus(context: Context): DndSyncStatus</ID>
+    <ID>ReturnCount:PhoneWearListenerService.kt$PhoneWearListenerService$override fun onMessageReceived(event: MessageEvent)</ID>
+    <ID>ReturnCount:RingerScheduleController.kt$RingerScheduleController$private fun applyForNow(context: Context, plans: List&lt;RingerSchedulePlan&gt;, trigger: String)</ID>
+    <ID>ReturnCount:RingerSyncBridge.kt$RingerSyncBridge$fun applyIncomingFromWatch(context: Context, envelope: MessageEnvelope): Pair&lt;String, String&gt;</ID>
+    <ID>ReturnCount:RingerSyncBridge.kt$RingerSyncBridge$fun onPhoneRingerModeChanged(context: Context, mode: Int)</ID>
+    <ID>ReturnCount:WakeRateLimiter.kt$WakeRateLimiter$@Synchronized fun decideAndMark( packageName: String, contentHash: String, now: Long = System.currentTimeMillis(), carriesMirror: Boolean = false, ): Decision</ID>
+    <ID>SwallowedException:PhoneDndSyncBridge.kt$PhoneDndSyncBridge$error: Exception</ID>
+    <ID>SwallowedException:PhoneMainActivity.kt$error: Exception</ID>
+    <ID>SwallowedException:RingerSyncBridge.kt$RingerSyncBridge$error: Exception</ID>
+    <ID>TooGenericExceptionCaught:PhoneDndSyncBridge.kt$PhoneDndSyncBridge$error: Exception</ID>
+    <ID>TooGenericExceptionCaught:PhoneMainActivity.kt$error: Exception</ID>
+    <ID>TooGenericExceptionCaught:RingerSyncBridge.kt$RingerSyncBridge$error: Exception</ID>
+    <ID>TooManyFunctions:AlarmBridgeController.kt$AlarmBridgeController</ID>
+    <ID>TooManyFunctions:NotificationRelayService.kt$NotificationRelayService : NotificationListenerService</ID>
+    <ID>TooManyFunctions:PhoneDndSyncBridge.kt$PhoneDndSyncBridge</ID>
+    <ID>TooManyFunctions:PhoneMainActivity.kt$com.h_ide4pda.wakemywatch.phone.PhoneMainActivity.kt</ID>
+    <ID>TooManyFunctions:PhoneWearListenerService.kt$PhoneWearListenerService : WearableListenerService</ID>
+    <ID>UnusedParameter:NotificationRelayService.kt$NotificationRelayService$sbn: StatusBarNotification</ID>
+    <ID>UnusedPrivateMember:PhoneMainActivity.kt$@Composable private fun &lt;T&gt; ChoiceDialog(title: String, options: List&lt;Pair&lt;T, String&gt;&gt;, selected: T, onSelect: (T) -&gt; Unit, onDismiss: () -&gt; Unit)</ID>
+    <ID>WildcardImport:PhoneMainActivity.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:PhoneMainActivity.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>WildcardImport:PhoneMainActivity.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:PhoneMainActivity.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:PhoneMainActivity.kt$import com.h_ide4pda.wakemywatch.core.*</ID>
+    <ID>WildcardImport:PhoneMainActivity.kt$import com.h_ide4pda.wakemywatch.phone.ui.*</ID>
+    <ID>WildcardImport:PhoneWearListenerService.kt$import com.h_ide4pda.wakemywatch.core.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

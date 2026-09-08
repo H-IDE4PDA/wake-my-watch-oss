@@ -7,6 +7,17 @@ import android.os.Build
 import org.json.JSONArray
 import org.json.JSONObject
 
+/**
+ * OnePlus Watch model code -> human name (introduced vc61). Дописывать новые модели сюда.
+ * The technical "Model" row keeps showing the raw codename; only headline UI uses this.
+ */
+private val WATCH_MODEL_NAMES = mapOf(
+    "OPWWE261" to "OnePlus Watch 4",
+    "OPWWE251" to "OnePlus Watch 3",
+    "OPWWE234" to "OnePlus Watch 2R",
+    "OPWWE231" to "OnePlus Watch 2",
+)
+
 object DeviceFeatures {
     const val WAKE = "wake"
     const val ACK = "ack"
@@ -33,6 +44,14 @@ data class DeviceDescriptor(
             .filter { it.isNotBlank() }
             .joinToString(" ")
             .replace(Regex("(?i)^${Regex.escape(manufacturer)}\\s+${Regex.escape(manufacturer)}\\s+"), "$manufacturer ")
+
+    /**
+     * Human-readable name for headline UI (device-card title). Resolves the watch model code
+     * against [WATCH_MODEL_NAMES]; falls back to the raw [displayName] when the model is unknown
+     * to the dictionary. The "Model" detail row deliberately keeps [displayName].
+     */
+    val headline: String
+        get() = WATCH_MODEL_NAMES[model.trim()] ?: displayName
 
     fun toJson(): JSONObject = JSONObject()
         .put("role", role.name)

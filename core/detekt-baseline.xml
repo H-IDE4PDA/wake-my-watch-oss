@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LongParameterList:EventHistoryStore.kt$EventHistoryStore$( context: Context, type: String, result: String, detail: String, aggregationKey: String, windowMs: Long = 60_000L, )</ID>
+    <ID>LoopWithTooManyJumpStatements:EventHistoryStore.kt$EventHistoryStore$for</ID>
+    <ID>MagicNumber:AppSettings.kt$AppSettings.Companion$1439</ID>
+    <ID>MagicNumber:AppSettings.kt$AppSettings.Companion$17</ID>
+    <ID>MagicNumber:AppSettings.kt$AppSettings.Companion$60</ID>
+    <ID>MagicNumber:AppSettings.kt$AppSettings.Companion$8</ID>
+    <ID>MagicNumber:DeviceDescriptor.kt$DeviceDescriptor.Companion$34</ID>
+    <ID>MagicNumber:RingerSchedulePlan.kt$RingerScheduleEval$6</ID>
+    <ID>MagicNumber:RingerSchedulePlan.kt$RingerScheduleEval$7</ID>
+    <ID>MagicNumber:RingerSchedulePlan.kt$RingerSchedulePlan$22</ID>
+    <ID>MagicNumber:RingerSchedulePlan.kt$RingerSchedulePlan$60</ID>
+    <ID>MagicNumber:RingerSchedulePlan.kt$RingerSchedulePlan$7</ID>
+    <ID>MagicNumber:RingerSchedulePlan.kt$RingerSchedulePlan.Companion$1439</ID>
+    <ID>MagicNumber:RingerSchedulePlan.kt$RingerSchedulePlan.Companion$22</ID>
+    <ID>MagicNumber:RingerSchedulePlan.kt$RingerSchedulePlan.Companion$60</ID>
+    <ID>MagicNumber:RingerSchedulePlan.kt$RingerSchedulePlan.Companion$7</ID>
+    <ID>MagicNumber:VibroPatterns.kt$VibroPatterns$1000</ID>
+    <ID>MagicNumber:VibroPatterns.kt$VibroPatterns$130</ID>
+    <ID>MagicNumber:VibroPatterns.kt$VibroPatterns$180</ID>
+    <ID>MagicNumber:VibroPatterns.kt$VibroPatterns$60</ID>
+    <ID>MagicNumber:VibroPatterns.kt$VibroPatterns$70</ID>
+    <ID>MagicNumber:VibroPatterns.kt$VibroPatterns$80</ID>
+    <ID>MagicNumber:VibroPatterns.kt$VibroPatterns$90</ID>
+    <ID>MaxLineLength:AppSettings.kt$AppSettings.Companion$savedAlarmBridgeBeforePause = if (json.isNull("savedAlarmBridgeBeforePause")) null else json.optBoolean("savedAlarmBridgeBeforePause")</ID>
+    <ID>MaxLineLength:AppSettings.kt$AppSettings.Companion$savedDndSyncEnabledBeforePause = if (json.isNull("savedDndSyncEnabledBeforePause")) null else json.optBoolean("savedDndSyncEnabledBeforePause")</ID>
+    <ID>MaxLineLength:ConnectionDiagnosticsStore.kt$ConnectionDiagnosticsStore$mutate(context) { it.copy(connectedNodeIds = nodeIds.filter { id -&gt; id.isNotBlank() }.toSet(), checkedAt = now) }</ID>
+    <ID>MaxLineLength:DndSync.kt$DndSync$fun isDndOn(filter: Int): Boolean</ID>
+    <ID>MaxLineLength:DndSync.kt$DndSync$fun isValidInterruptionFilter(filter: Int): Boolean</ID>
+    <ID>MaxLineLength:RingerSchedulePlan.kt$RingerScheduleEval$fun anyEnabled(plans: List&lt;RingerSchedulePlan&gt;): Boolean</ID>
+    <ID>MaxLineLength:SettingsAudit.kt$SettingsAudit$add("key=ringerSchedulePlans old=${old.ringerSchedulePlans.size}/${old.ringerSchedulePlans.count { it.enabled }}on new=${new.ringerSchedulePlans.size}/${new.ringerSchedulePlans.count { it.enabled }}on")</ID>
+    <ID>PackageNaming:AppSettings.kt$package com.h_ide4pda.wakemywatch.core</ID>
+    <ID>PackageNaming:ConnectionDiagnosticsStore.kt$package com.h_ide4pda.wakemywatch.core</ID>
+    <ID>PackageNaming:DeviceDescriptor.kt$package com.h_ide4pda.wakemywatch.core</ID>
+    <ID>PackageNaming:DeviceStore.kt$package com.h_ide4pda.wakemywatch.core</ID>
+    <ID>PackageNaming:DndSync.kt$package com.h_ide4pda.wakemywatch.core</ID>
+    <ID>PackageNaming:EventHistoryStore.kt$package com.h_ide4pda.wakemywatch.core</ID>
+    <ID>PackageNaming:Handshake.kt$package com.h_ide4pda.wakemywatch.core</ID>
+    <ID>PackageNaming:PauseModeTransition.kt$package com.h_ide4pda.wakemywatch.core</ID>
+    <ID>PackageNaming:Protocol.kt$package com.h_ide4pda.wakemywatch.core</ID>
+    <ID>PackageNaming:RingerSchedulePlan.kt$package com.h_ide4pda.wakemywatch.core</ID>
+    <ID>PackageNaming:RingerSync.kt$package com.h_ide4pda.wakemywatch.core</ID>
+    <ID>PackageNaming:SettingsAudit.kt$package com.h_ide4pda.wakemywatch.core</ID>
+    <ID>PackageNaming:VibroPatterns.kt$package com.h_ide4pda.wakemywatch.core</ID>
+    <ID>PackageNaming:WearTransport.kt$package com.h_ide4pda.wakemywatch.core</ID>
+    <ID>ReturnCount:AppSettings.kt$AppSettings.Companion$private fun readRingerSchedulePlans(json: JSONObject): List&lt;RingerSchedulePlan&gt;</ID>
+    <ID>ReturnCount:AppSettings.kt$AppSettingsStore$fun saveIfNewer(context: Context, incoming: AppSettings): Boolean</ID>
+    <ID>ReturnCount:Handshake.kt$Handshake$fun handleIncoming( context: Context, sourceNodeId: String, envelope: MessageEnvelope, localRole: DeviceRole, replyPath: String, ): DeviceDescriptor?</ID>
+    <ID>ReturnCount:RingerSchedulePlan.kt$RingerScheduleEval$fun covers(plan: RingerSchedulePlan, dayMon0: Int, minuteOfDay: Int): Boolean</ID>
+    <ID>ReturnCount:VibroPatterns.kt$VibroPatterns$fun playNotification(context: Context): Boolean</ID>
+  </CurrentIssues>
+</SmellBaseline>
