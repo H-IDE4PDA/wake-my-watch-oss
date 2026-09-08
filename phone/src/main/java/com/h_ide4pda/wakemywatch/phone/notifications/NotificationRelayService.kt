@@ -2,7 +2,12 @@ package com.h_ide4pda.wakemywatch.phone.notifications
 
 import android.app.Notification
 import android.app.NotificationManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ApplicationInfo
+import android.media.AudioManager
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -14,6 +19,7 @@ import com.h_ide4pda.wakemywatch.core.Protocol
 import com.h_ide4pda.wakemywatch.core.WearTransport
 import com.h_ide4pda.wakemywatch.phone.alarm.AlarmBridgeController
 import com.h_ide4pda.wakemywatch.phone.dnd.PhoneDndSyncBridge
+import com.h_ide4pda.wakemywatch.phone.ringer.RingerSyncBridge
 import com.h_ide4pda.wakemywatch.phone.settings.PhoneSettings
 import com.h_ide4pda.wakemywatch.phone.settings.PhoneSettingsStore
 import org.json.JSONObject
@@ -28,10 +34,16 @@ class NotificationRelayService : NotificationListenerService() {
     private val listenerSessionId = UUID.randomUUID().toString().take(8)
     private var listenerConnectedElapsed = 0L
 
+    // Ringer-mode changes have no NotificationListenerService callback of their own (unlike
+    // onInterruptionFilterChanged for DND), so the phone's sound profile is observed with a
+    // context-registered receiver tied to this long-lived service's lifecycle.
+    private var ringerModeReceiver: BroadcastReceiver? = null
+
     override fun onListenerConnected() {
         super.onListenerConnected()
         listenerConnectedElapsed = SystemClock.elapsedRealtime()
         AlarmBridgeController.attach(this)
+        registerRingerModeReceiver()
         EventHistoryStore.add(
             this,
             "LISTENER",
@@ -53,6 +65,7 @@ class NotificationRelayService : NotificationListenerService() {
         val pendingCount = pending.size
         cancelPending()
         AlarmBridgeController.detach(this)
+        unregisterRingerModeReceiver()
         EventHistoryStore.add(
             this,
             "LISTENER",
@@ -65,12 +78,39 @@ class NotificationRelayService : NotificationListenerService() {
     override fun onDestroy() {
         cancelPending()
         AlarmBridgeController.detach(this)
+        unregisterRingerModeReceiver()
         super.onDestroy()
     }
 
     override fun onInterruptionFilterChanged(interruptionFilter: Int) {
         super.onInterruptionFilterChanged(interruptionFilter)
         PhoneDndSyncBridge.onLocalInterruptionFilterChanged(this, interruptionFilter)
+    }
+
+    private fun registerRingerModeReceiver() {
+        if (ringerModeReceiver != null) return
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (intent.action != AudioManager.RINGER_MODE_CHANGED_ACTION) return
+                val mode = intent.getIntExtra(
+                    AudioManager.EXTRA_RINGER_MODE,
+                    context.getSystemService(AudioManager::class.java).ringerMode,
+                )
+                RingerSyncBridge.onPhoneRingerModeChanged(context, mode)
+            }
+        }
+        runCatching {
+            registerReceiver(receiver, IntentFilter(AudioManager.RINGER_MODE_CHANGED_ACTION))
+            ringerModeReceiver = receiver
+        }.onFailure {
+            EventHistoryStore.add(this, "RINGER_SYNC", "RECEIVER_REGISTER_FAILED", it.message ?: it.javaClass.simpleName)
+        }
+    }
+
+    private fun unregisterRingerModeReceiver() {
+        val receiver = ringerModeReceiver ?: return
+        ringerModeReceiver = null
+        runCatching { unregisterReceiver(receiver) }
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
@@ -90,8 +130,13 @@ class NotificationRelayService : NotificationListenerService() {
             skipNotification(sbn, "app_paused", snapshot)
             return
         }
-        if (settings.hasNoWatchReaction) {
-            skipNotification(sbn, "no_watch_reaction", snapshot)
+        // One gate for every reaction. `screenWake` off no longer switches the relay off — it
+        // only keeps the panel dark; the sound correction (and, for silent notifications, the
+        // wrist buzz) still cross the bridge. Forwarding stops only once nothing at all would
+        // happen on the watch. Silent notifications fold into the same check via their own pair
+        // of toggles — no second parallel path.
+        if (settings.forwardsNothingToWatch(snapshot.isSilentLowImportance)) {
+            skipNotification(sbn, "no_watch_reaction silent=${if (snapshot.isSilentLowImportance) 1 else 0}", snapshot)
             return
         }
         if (!settings.isPackageAllowed(sbn.packageName)) {
@@ -106,8 +151,12 @@ class NotificationRelayService : NotificationListenerService() {
             skipNotification(sbn, "local_only", snapshot)
             return
         }
-        if (settings.skipSilentNotifications && snapshot.isSilentLowImportance) {
-            skipNotification(sbn, "silent_low_importance", snapshot)
+        if (snapshot.isGroupSummary && hasGroupChildren(sbn)) {
+            // A summary that ships with its children: the children carry the real content and
+            // waking twice for one conversation is the double alert this guards against. A lone
+            // summary with no children (e.g. Reddit chat DMs) is itself the message and the
+            // bridge drops it — that one goes through.
+            skipNotification(sbn, "group_summary_with_children", snapshot)
             return
         }
         if (snapshot.isInvisibleSystemNotification) {
@@ -120,6 +169,10 @@ class NotificationRelayService : NotificationListenerService() {
         }
         if (snapshot.isUpcomingAlarmNotice) {
             skipNotification(sbn, "upcoming_alarm_notice", snapshot)
+            return
+        }
+        snapshot.nonEventStatusReason?.let { reason ->
+            skipNotification(sbn, reason, snapshot)
             return
         }
         // Remember contents before environmental suppression so an unchanged repost
@@ -235,16 +288,21 @@ class NotificationRelayService : NotificationListenerService() {
             skipNotification(active, "app_paused", snapshot)
             return
         }
-        if (settings.hasNoWatchReaction || !settings.isPackageAllowed(active.packageName)) {
-            skipNotification(active, if (settings.hasNoWatchReaction) "no_watch_reaction" else "app_filter", snapshot)
+        val nothingToForward = settings.forwardsNothingToWatch(snapshot.isSilentLowImportance)
+        if (nothingToForward || !settings.isPackageAllowed(active.packageName)) {
+            skipNotification(
+                active,
+                if (nothingToForward) "no_watch_reaction silent=${if (snapshot.isSilentLowImportance) 1 else 0}" else "app_filter",
+                snapshot,
+            )
             return
         }
         if (snapshot.isLocalOnly) {
             skipNotification(active, "local_only", snapshot)
             return
         }
-        if (settings.skipSilentNotifications && snapshot.isSilentLowImportance) {
-            skipNotification(active, "silent_low_importance", snapshot)
+        if (snapshot.isGroupSummary && hasGroupChildren(active)) {
+            skipNotification(active, "group_summary_with_children", snapshot)
             return
         }
         if (snapshot.isInvisibleSystemNotification) {
@@ -259,6 +317,10 @@ class NotificationRelayService : NotificationListenerService() {
             skipNotification(active, "upcoming_alarm_notice", snapshot)
             return
         }
+        snapshot.nonEventStatusReason?.let { reason ->
+            skipNotification(active, reason, snapshot)
+            return
+        }
         if (candidate.staleEligible && snapshot.postAgeMs > STALE_NOTIFICATION_MS) {
             skipNotification(active, "stale_notification_repeat ageMs=${snapshot.postAgeMs}", snapshot)
             return
@@ -268,8 +330,8 @@ class NotificationRelayService : NotificationListenerService() {
             return
         }
 
-        // Computed before the rate limiter so it can tell that dropping this notification would
-        // not merely cost a screen wake — the watch would never see the message at all.
+        // Built before the rate limiter so it can tell that dropping this notification would not
+        // merely cost a screen wake — the watch would never see the message any other way.
         val mirror = if (settings.mirrorUndelivered) mirrorContent(active, snapshot) else null
         val rateDecision = wakeRateLimiter.decideAndMark(
             packageName = active.packageName,
@@ -292,6 +354,17 @@ class NotificationRelayService : NotificationListenerService() {
         mirror: JSONObject?,
         suppressScreenWake: Boolean,
     ) {
+        // Screen wake for a silent notification is gated separately (silentWakeScreen) — it
+        // arrives collapsed to the watch face, so lighting the panel usually shows nothing.
+        // Vibration is the opposite: only silent notifications get it. A normal notification's
+        // own bridge delivery already buzzes the watch through the system channel, so vibrating
+        // again here would double it — that was the vc83 bug this replaces.
+        // ...and a second reason the panel can stay dark: a screen wake this soon after the last
+        // one (WakeRateLimiter's screen cooldown). The wrist buzz / sound correction below is
+        // still worth repeating for every message in a burst; a repeat flash is not.
+        val wakeScreenThisEvent = (!snapshot.isSilentLowImportance || settings.silentWakeScreen) && !suppressScreenWake
+        val vibrateThisEvent = snapshot.isSilentLowImportance && settings.silentVibrate
+
         val triggerDetail = buildString {
             append(snapshot.compactDetail)
             append(" mirror=").append(if (mirror != null) 1 else 0)
@@ -305,13 +378,13 @@ class NotificationRelayService : NotificationListenerService() {
             .put("notificationId", sbn.id)
             .put("groupKey", sbn.groupKey)
             .put("postTime", sbn.postTime)
-            .put("screenWake", settings.screenWake && !suppressScreenWake)
             .put("phoneDndBlocksWake", isPhoneDndBlocking() && !settings.wakeScreenOnPhoneDnd)
+            .put("wakeScreen", wakeScreenThisEvent)
             .put("respectWatchDnd", settings.respectWatchDnd)
             .put("skipWakeOffWrist", settings.skipWakeOffWrist)
             .put("skipSoundOffWrist", settings.skipSoundOffWrist)
             .put("soundMode", settings.soundMode.wireValue)
-            .put("vibrateOnWake", settings.vibrateOnWake)
+            .put("vibrateOnWake", vibrateThisEvent)
         mirror?.let { payload.put("mirror", it) }
         val envelope = MessageEnvelope(type = "WAKE", payload = payload)
         WearTransport.sendPreferred(this, Protocol.WAKE, envelope) { result ->
@@ -347,10 +420,10 @@ class NotificationRelayService : NotificationListenerService() {
     /**
      * Content for the watch to display itself, or null when the bridge is expected to deliver.
      *
-     * Reddit chat DMs arrive as a lone group summary with no child notification, and Wear OS
-     * drops summaries like that when bridging — the wrist buzzes with nothing to look at. That
-     * is the only case we know for certain never reaches the watch, so it is the only one
-     * mirrored: everything else OHealth shows on its own and a mirror would just double it.
+     * The only case we know for certain never reaches the watch is a lone group summary with no
+     * child notification (Reddit chat DMs) — Wear OS drops summaries like that while bridging, so
+     * the wrist buzzes with nothing to look at. Everything else the watch shows on its own and a
+     * mirror would just double it.
      */
     private fun mirrorContent(sbn: StatusBarNotification, snapshot: NotificationSnapshot): JSONObject? {
         if (!snapshot.isGroupSummary || hasGroupChildren(sbn)) return null
@@ -561,6 +634,20 @@ class NotificationRelayService : NotificationListenerService() {
         val isLocalOnly: Boolean
             get() = (flags and Notification.FLAG_LOCAL_ONLY) != 0
 
+        // Ongoing status notifications an app rewrites continuously — playback UI, turn-by-turn
+        // navigation, a download progress bar. Each one is a live status surface, not an event,
+        // and every rewrite otherwise buzzes the wrist (a track skip, every turn, every percent).
+        // Matched purely by Android's own category, so alarms (CATEGORY_ALARM), calls
+        // (CATEGORY_CALL) and messenger notifications are untouched. "Download finished" normally
+        // arrives as a separate notification, not the same one carrying the progress bar.
+        val nonEventStatusReason: String?
+            get() = when (category) {
+                Notification.CATEGORY_TRANSPORT -> "media_playback"
+                Notification.CATEGORY_NAVIGATION -> "navigation_ongoing"
+                Notification.CATEGORY_PROGRESS -> "download_progress"
+                else -> null
+            }
+
         val channelLooksSilent: Boolean
             get() = channelId?.contains("silent", ignoreCase = true) == true
 
@@ -593,6 +680,7 @@ class NotificationRelayService : NotificationListenerService() {
                 append(" summary=").append(isGroupSummary.asBit())
                 append(" localOnly=").append(isLocalOnly.asBit())
                 append(" silentHint=").append(channelLooksSilent.asBit())
+                append(" nonEventStatus=").append(nonEventStatusReason ?: "no")
                 append(" filter=").append(if (filterAllowed) "allowed" else "blocked")
                 append(" filterMode=").append(filterMode)
             }

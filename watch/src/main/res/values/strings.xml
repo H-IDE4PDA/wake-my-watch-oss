@@ -5,8 +5,8 @@
     <string name="app_paused_status_on">Paused</string>
     <string name="app_paused_status_off">Active</string>
     <string name="pause_settings_title">Pause settings</string>
-    <string name="pause_keeps_alarm_and_dnd">Keep alarms and DND sync working while paused</string>
-    <string name="pause_keeps_alarm_and_dnd_summary">While paused, ordinary notifications stay silent, but alarms and DND sync keep working</string>
+    <string name="pause_keeps_alarm_and_dnd">Keep alarm forwarding, Do Not Disturb sync and sound-profile sync working while paused</string>
+    <string name="pause_keeps_alarm_and_dnd_summary">While paused, ordinary notifications stay silent, but alarm forwarding to the watch, Do Not Disturb sync and sound-profile sync keep working</string>
     <string name="pause_silence_everything">Silence everything, including alarms and DND sync</string>
     <string name="screen_wake">Screen Wake</string>
     <string name="enabled">Enabled</string>
@@ -32,7 +32,7 @@
     <string name="alarm_action_sending">Sending to phone…</string>
     <string name="alarm_action_failed">Could not perform the action. Tap a button to try again.</string>
     <string name="alarm_action_timeout">No confirmation was received from the phone.</string>
-    <string name="last_handshake">Last handshake</string>
+    <string name="last_handshake">Last connection check</string>
     <string name="refresh">Refresh</string>
     <string name="granted">Granted</string>
     <string name="not_granted">Not granted</string>
@@ -46,5 +46,5 @@
     <string name="dnd_sync_open_adb_guide_phone_summary">Reliable ADB setup</string>
     <string name="dnd_sync_refresh_status">Refresh status</string>
     <string name="alarm_notification_channel_name">Alarm screen</string>
-    <string name="mirror_notification_channel_name">Notifications the bridge dropped</string>
+    <string name="mirror_notification_channel_name">Notifications that didn\'t reach the watch</string>
 </resources>

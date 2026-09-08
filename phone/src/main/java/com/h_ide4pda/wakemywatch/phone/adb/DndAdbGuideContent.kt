@@ -489,7 +489,7 @@ object DndAdbGuideContent {
 
     <section>
       <h2>8. Выдайте доступ к режиму «Не беспокоить» на часах</h2>
-      <p>Это разрешение нужно, чтобы Wake My Watch мог включать и выключать режим «Не беспокоить» на часах.</p>
+      <p>Это разрешение нужно, чтобы Wake My Watch мог переносить режим «Не беспокоить» с телефона на часы. На телефонах OnePlus это и без ADB делает OHealth — доступ актуален на остальных телефонах. Он же задействуется при синхронизации профиля звука: режим «Без звука» на телефоне включает «Не беспокоить» на часах.</p>
       <div class="code-wrap">
         <div class="code-head"><span>Команда</span><button class="copy" data-copy="adb shell cmd notification allow_dnd com.h_ide4pda.wakemywatch">Копировать</button></div>
         <pre><code>adb shell cmd notification allow_dnd com.h_ide4pda.wakemywatch</code></pre>

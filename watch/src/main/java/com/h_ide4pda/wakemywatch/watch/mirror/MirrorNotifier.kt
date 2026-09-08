@@ -11,7 +11,7 @@ import com.h_ide4pda.wakemywatch.watch.R
  * Shows a notification the bridge never delivered.
  *
  * Only used for notifications the phone marked as provably undelivered (a lone group summary —
- * Reddit chat DMs), so this never competes with what OHealth already puts on the watch.
+ * Reddit chat DMs), so this never competes with what the stock sync already puts on the watch.
  *
  * The channel is IMPORTANCE_HIGH so Wear OS draws a real card and a watch-face dot — the whole
  * point is visibility. Its own sound and vibration are switched off: Wake My Watch has already

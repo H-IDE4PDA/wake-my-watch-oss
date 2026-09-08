@@ -16,6 +16,9 @@ object WatchDndPermissionState {
     data class Snapshot(
         val notificationListenerGranted: Boolean,
         val dndPolicyAccessGranted: Boolean,
+        // Whether the watch is allowed to post its own notifications (POST_NOTIFICATIONS). Only
+        // used for the mirrored-notification card; runtime-requested when Alarm Bridge is on.
+        val postNotificationsGranted: Boolean,
         val currentInterruptionFilter: Int,
     ) {
         val ready: Boolean get() = notificationListenerGranted && dndPolicyAccessGranted
@@ -27,6 +30,7 @@ object WatchDndPermissionState {
         return Snapshot(
             notificationListenerGranted = NotificationManagerCompat.getEnabledListenerPackages(app).contains(app.packageName),
             dndPolicyAccessGranted = runCatching { notificationManager.isNotificationPolicyAccessGranted }.getOrDefault(false),
+            postNotificationsGranted = runCatching { NotificationManagerCompat.from(app).areNotificationsEnabled() }.getOrDefault(false),
             currentInterruptionFilter = runCatching { notificationManager.currentInterruptionFilter }.getOrDefault(NotificationManager.INTERRUPTION_FILTER_UNKNOWN),
         )
     }

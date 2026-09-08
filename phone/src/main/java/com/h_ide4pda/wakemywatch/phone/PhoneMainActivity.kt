@@ -46,9 +46,12 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -59,6 +62,9 @@ import com.h_ide4pda.wakemywatch.core.*
 import com.h_ide4pda.wakemywatch.phone.adb.DndAdbGuideContent
 import com.h_ide4pda.wakemywatch.phone.dnd.PhoneDndSyncBridge
 import com.h_ide4pda.wakemywatch.phone.notifications.NotificationRelayService
+import com.h_ide4pda.wakemywatch.core.RingerSchedulePlan
+import com.h_ide4pda.wakemywatch.phone.ringer.RingerScheduleController
+import com.h_ide4pda.wakemywatch.phone.ringer.RingerSyncBridge
 import com.h_ide4pda.wakemywatch.phone.permissions.PermissionProbe
 import com.h_ide4pda.wakemywatch.phone.settings.PhoneSettings
 import com.h_ide4pda.wakemywatch.phone.settings.PhoneSettingsStore
@@ -79,6 +85,11 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+
+// TODO: вставить реальные ссылки/адрес
+private const val KOFI_URL = "https://Ko-fi.com/h_ide4pda"
+private const val MONOBANK_URL = "https://send.monobank.ua/jar/4W85VhKWit"
+private const val USDT_TRC20_ADDRESS = "TSB1MTtXw9DXxTt9oEkyKUbQkNTqLc2RLb"
 
 class PhoneMainActivity : ComponentActivity() {
     private var resumeCounter by mutableIntStateOf(0)
@@ -137,8 +148,8 @@ class PhoneMainActivity : ComponentActivity() {
     }
 }
 
-private enum class Page { MAIN, DEVICE, APP_FILTER, PERMISSIONS, DIAGNOSTICS, EVENT_HISTORY }
-private enum class SettingsDialog { SOUND, WRIST, DND, PAUSE }
+private enum class Page { MAIN, DEVICE, APP_FILTER, PERMISSIONS, DIAGNOSTICS, EVENT_HISTORY, RINGER_SCHEDULES, RINGER_SCHEDULE_EDIT }
+private enum class SettingsDialog { SOUND, WRIST, DND, PAUSE, SILENT }
 private data class InstalledApp(val label: String, val packageName: String)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -146,11 +157,15 @@ private data class InstalledApp(val label: String, val packageName: String)
 private fun PhoneApp(refreshToken: Int) {
     val context = LocalContext.current
     val mainHandler = remember { Handler(Looper.getMainLooper()) }
+    val appScope = rememberCoroutineScope()
     var page by remember { mutableStateOf(Page.MAIN) }
     var settings by remember { mutableStateOf(PhoneSettingsStore.load(context)) }
     var activeDialog by remember { mutableStateOf<SettingsDialog?>(null) }
+    // Which ringer-schedule plan the edit screen is on; null while a brand-new plan is being added.
+    var editingPlanId by remember { mutableStateOf<String?>(null) }
     var showAlarmWarning by remember { mutableStateOf(false) }
     var showLegal by remember { mutableStateOf(false) }
+    var showDonate by remember { mutableStateOf(false) }
     var remote by remember { mutableStateOf(DeviceStore.remote(context)) }
     var ack by remember { mutableStateOf(DeviceStore.lastAck(context)) }
     var connection by remember { mutableStateOf(ConnectionDiagnosticsStore.snapshot(context)) }
@@ -168,7 +183,17 @@ private fun PhoneApp(refreshToken: Int) {
     }
 
     BackHandler(enabled = page != Page.MAIN) {
-        page = if (page == Page.EVENT_HISTORY) Page.DIAGNOSTICS else Page.MAIN
+        page = when (page) {
+            Page.EVENT_HISTORY -> Page.DIAGNOSTICS
+            Page.RINGER_SCHEDULE_EDIT -> Page.RINGER_SCHEDULES
+            else -> Page.MAIN
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        // Re-arm the ringer schedule on every app open: a force-stop cancels its alarms and the
+        // boot receiver never runs after that until the app is opened again.
+        RingerScheduleController.sync(context, "app_open")
     }
 
     LaunchedEffect(Unit) {
@@ -199,6 +224,11 @@ private fun PhoneApp(refreshToken: Int) {
         SettingsAudit.recordChange(context, "phone_ui", previous, revised)
         SettingsSync.send(context, PhoneDndSyncBridge.maskForNativeOHealth(context, revised)) { result ->
             EventHistoryStore.add(context, "SETTINGS_SYNC", if (result.success) "SENT" else "FAILED", result.detail)
+        }
+        if (previous.ringerSchedulePlans != revised.ringerSchedulePlans ||
+            previous.isFullyPaused != revised.isFullyPaused
+        ) {
+            RingerScheduleController.sync(context, "settings_change")
         }
     }
 
@@ -336,7 +366,25 @@ private fun PhoneApp(refreshToken: Int) {
                 onSettings = ::update,
                 onPauseSettings = { activeDialog = SettingsDialog.PAUSE },
                 onSound = { activeDialog = SettingsDialog.SOUND },
+                onRingerSyncToggle = { enabled ->
+                    if (enabled) {
+                        // Flip the setting first (mirrors DND's enable path), then push the
+                        // phone's current profile to the watch off the main thread.
+                        update(settings.copy(ringerSyncEnabled = true))
+                        appScope.launch {
+                            withContext(Dispatchers.IO) {
+                                RingerSyncBridge.applyCurrentRingerOnEnableBlocking(context)
+                            }
+                        }
+                    } else {
+                        // Turning off never touches the watch's profile — unlike DND, the user
+                        // may want to leave the watch where it is and set it themselves.
+                        update(settings.copy(ringerSyncEnabled = false))
+                    }
+                },
+                onRingerSchedule = { page = Page.RINGER_SCHEDULES },
                 onWrist = { activeDialog = SettingsDialog.WRIST },
+                onSilent = { activeDialog = SettingsDialog.SILENT },
                 onDnd = { activeDialog = SettingsDialog.DND },
                 onAppFilter = { page = Page.APP_FILTER },
                 onAlarmBridge = {
@@ -345,18 +393,19 @@ private fun PhoneApp(refreshToken: Int) {
                 onDevice = { page = Page.DEVICE },
                 onPermissions = { page = Page.PERMISSIONS },
                 onDiagnostics = { page = Page.DIAGNOSTICS },
+                onDonate = { showDonate = true },
                 onLegal = { showLegal = true },
                 onGrant = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) },
                 onTest = {
                     val payload = JSONObject()
                         .put("test", true)
                         .put("packageName", "wake_my_watch_test")
-                        .put("screenWake", settings.screenWake)
                         .put("respectWatchDnd", settings.respectWatchDnd)
                         .put("skipWakeOffWrist", settings.skipWakeOffWrist)
                         .put("skipSoundOffWrist", settings.skipSoundOffWrist)
                         .put("soundMode", settings.soundMode.wireValue)
-                        .put("vibrateOnWake", settings.vibrateOnWake)
+                        .put("wakeScreen", true)
+                        .put("vibrateOnWake", settings.silentVibrate)
                     val envelope = MessageEnvelope(type = "WAKE_TEST", payload = payload)
                     WearTransport.sendPreferred(context, Protocol.WAKE, envelope) { result ->
                         toastText = if (result.success) context.getString(R.string.test_sent) else result.detail
@@ -385,6 +434,7 @@ private fun PhoneApp(refreshToken: Int) {
             Page.PERMISSIONS -> PermissionsScreen(
                 modifier = Modifier.padding(padding),
                 snapshot = permissionProbe,
+                ringerSyncEnabled = settings.ringerSyncEnabled,
                 onBack = { page = Page.MAIN },
                 onRefresh = ::refreshPermissionProbe,
                 onNotificationListener = ::openNotificationListenerSettings,
@@ -411,6 +461,42 @@ private fun PhoneApp(refreshToken: Int) {
                 onBack = { page = Page.DIAGNOSTICS },
                 onToast = { toastText = it },
             )
+            Page.RINGER_SCHEDULES -> RingerSchedulesScreen(
+                modifier = Modifier.padding(padding),
+                plans = settings.ringerSchedulePlans,
+                onBack = { page = Page.MAIN },
+                onTogglePlan = { id, on ->
+                    update(settings.copy(ringerSchedulePlans = settings.ringerSchedulePlans.map {
+                        if (it.id == id) it.copy(enabled = on) else it
+                    }))
+                },
+                onEditPlan = { id -> editingPlanId = id; page = Page.RINGER_SCHEDULE_EDIT },
+                onAddPlan = { editingPlanId = null; page = Page.RINGER_SCHEDULE_EDIT },
+            )
+            Page.RINGER_SCHEDULE_EDIT -> {
+                val existing = editingPlanId?.let { id -> settings.ringerSchedulePlans.find { it.id == id } }
+                RingerSchedulePlanScreen(
+                    modifier = Modifier.padding(padding),
+                    original = existing,
+                    onBack = { page = Page.RINGER_SCHEDULES },
+                    onSave = { plan ->
+                        val list = settings.ringerSchedulePlans
+                        val next = if (list.any { it.id == plan.id }) {
+                            list.map { if (it.id == plan.id) plan else it }
+                        } else {
+                            list + plan
+                        }
+                        update(settings.copy(ringerSchedulePlans = next))
+                        page = Page.RINGER_SCHEDULES
+                    },
+                    onDelete = existing?.let { plan ->
+                        {
+                            update(settings.copy(ringerSchedulePlans = settings.ringerSchedulePlans.filterNot { it.id == plan.id }))
+                            page = Page.RINGER_SCHEDULES
+                        }
+                    },
+                )
+            }
         }
     }
 
@@ -421,6 +507,7 @@ private fun PhoneApp(refreshToken: Int) {
             onDismiss = { activeDialog = null },
         )
         SettingsDialog.WRIST -> WristDialog(settings, ::update) { activeDialog = null }
+        SettingsDialog.SILENT -> SilentNotificationsDialog(settings, ::update) { activeDialog = null }
         SettingsDialog.PAUSE -> PauseSettingsDialog(settings, ::update) { activeDialog = null }
         SettingsDialog.DND -> DndDialog(
             settings = settings,
@@ -476,6 +563,52 @@ private fun PhoneApp(refreshToken: Int) {
         }
     }
 
+    if (showDonate) {
+        val clipboard = LocalClipboardManager.current
+        ModalBottomSheet(
+            onDismissRequest = { showDonate = false },
+            containerColor = WmwSurface,
+            contentColor = WmwText,
+        ) {
+            Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
+                Text(stringResource(R.string.donate_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(20.dp))
+                ActionCard(
+                    ImageVector.vectorResource(id = R.drawable.ic_local_cafe),
+                    stringResource(R.string.donate_kofi),
+                    stringResource(R.string.donate_kofi_summary),
+                    onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(KOFI_URL))) },
+                    tint = WmwGreen,
+                )
+                Spacer(Modifier.height(10.dp))
+                ActionCard(
+                    ImageVector.vectorResource(id = R.drawable.ic_account_balance),
+                    stringResource(R.string.donate_monobank),
+                    stringResource(R.string.donate_monobank_summary),
+                    onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(MONOBANK_URL))) },
+                    tint = WmwBlue,
+                )
+                Spacer(Modifier.height(10.dp))
+                ActionCard(
+                    ImageVector.vectorResource(id = R.drawable.ic_currency_exchange),
+                    stringResource(R.string.donate_usdt),
+                    USDT_TRC20_ADDRESS,
+                    onClick = {
+                        clipboard.setText(AnnotatedString(USDT_TRC20_ADDRESS))
+                        toastText = context.getString(R.string.donate_address_copied)
+                    },
+                    tint = WmwPurple,
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(stringResource(R.string.donate_usdt_tap_copy), color = WmwMuted, fontSize = 12.sp)
+                Spacer(Modifier.height(20.dp))
+                Button(onClick = { showDonate = false }, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.close))
+                }
+            }
+        }
+    }
+
     toastText?.let { text ->
         LaunchedEffect(text) {
             android.widget.Toast.makeText(context, text, android.widget.Toast.LENGTH_SHORT).show()
@@ -498,13 +631,17 @@ private fun MainScreen(
     onSettings: (PhoneSettings) -> Unit,
     onPauseSettings: () -> Unit,
     onSound: () -> Unit,
+    onRingerSyncToggle: (Boolean) -> Unit,
+    onRingerSchedule: () -> Unit,
     onWrist: () -> Unit,
+    onSilent: () -> Unit,
     onDnd: () -> Unit,
     onAppFilter: () -> Unit,
     onAlarmBridge: () -> Unit,
     onDevice: () -> Unit,
     onPermissions: () -> Unit,
     onDiagnostics: () -> Unit,
+    onDonate: () -> Unit,
     onLegal: () -> Unit,
     onGrant: () -> Unit,
     onTest: () -> Unit,
@@ -566,15 +703,9 @@ private fun MainScreen(
                 DividerLine()
                 SettingRow(
                     Icons.Default.Notifications,
-                    stringResource(R.string.skip_silent_notifications),
-                    stringResource(R.string.skip_silent_notifications_summary),
-                    trailing = {
-                        Switch(
-                            checked = settings.skipSilentNotifications,
-                            onCheckedChange = { onSettings(settings.copy(skipSilentNotifications = it)) },
-                        )
-                    },
-                    onClick = { onSettings(settings.copy(skipSilentNotifications = !settings.skipSilentNotifications)) },
+                    stringResource(R.string.silent_notifications),
+                    silentNotificationsSummary(settings),
+                    onClick = onSilent,
                 )
                 DividerLine()
                 SettingRow(
@@ -591,6 +722,45 @@ private fun MainScreen(
                 )
                 DividerLine()
                 SettingRow(ImageVector.vectorResource(id = R.drawable.ic_volume_up), stringResource(R.string.sound_mode), soundModeLabel(settings), onClick = onSound)
+                DividerLine()
+                SettingRow(
+                    ImageVector.vectorResource(id = R.drawable.ic_graphic_eq),
+                    stringResource(R.string.ringer_sync_enable),
+                    stringResource(R.string.ringer_sync_summary),
+                    trailing = {
+                        Switch(
+                            checked = settings.ringerSyncEnabled,
+                            onCheckedChange = onRingerSyncToggle,
+                        )
+                    },
+                    onClick = { onRingerSyncToggle(!settings.ringerSyncEnabled) },
+                )
+                DividerLine()
+                SettingRow(
+                    ImageVector.vectorResource(id = R.drawable.ic_graphic_eq),
+                    stringResource(R.string.ringer_reverse_sync_enable),
+                    stringResource(R.string.ringer_reverse_sync_summary),
+                    enabled = settings.ringerSyncEnabled,
+                    trailing = {
+                        Switch(
+                            checked = settings.ringerSyncEnabled && settings.ringerReverseSyncEnabled,
+                            enabled = settings.ringerSyncEnabled,
+                            onCheckedChange = { onSettings(settings.copy(ringerReverseSyncEnabled = it)) },
+                        )
+                    },
+                    onClick = {
+                        if (settings.ringerSyncEnabled) {
+                            onSettings(settings.copy(ringerReverseSyncEnabled = !settings.ringerReverseSyncEnabled))
+                        }
+                    },
+                )
+                DividerLine()
+                SettingRow(
+                    Icons.Default.DateRange,
+                    stringResource(R.string.ringer_schedule),
+                    ringerScheduleSummary(settings),
+                    onClick = onRingerSchedule,
+                )
                 DividerLine()
                 SettingRow(
                     ImageVector.vectorResource(id = R.drawable.ic_pan_tool),
@@ -654,6 +824,18 @@ private fun MainScreen(
                             onClick = null,
                         )
                     }
+                    // Ringer sync is not force-enabled on entering safe pause (unlike Alarm Bridge
+                    // and DND sync), so this reminder row only appears when the user already had it on.
+                    if (settings.appPaused && settings.ringerSyncEnabled) {
+                        DividerLine()
+                        SettingRow(
+                            ImageVector.vectorResource(id = R.drawable.ic_graphic_eq),
+                            stringResource(R.string.ringer_sync_enable),
+                            stringResource(R.string.paused_stays_active),
+                            trailing = { Switch(checked = true, onCheckedChange = {}, enabled = false) },
+                            onClick = null,
+                        )
+                    }
                 }
             }
         }
@@ -667,6 +849,8 @@ private fun MainScreen(
         ActionCard(Icons.Default.Lock, stringResource(R.string.permissions_and_background), stringResource(R.string.permissions_and_background_summary), onPermissions)
         Spacer(Modifier.height(10.dp))
         ActionCard(Icons.Default.Search, stringResource(R.string.diagnostics), stringResource(R.string.diagnostics_summary), onDiagnostics)
+        Spacer(Modifier.height(10.dp))
+        ActionCard(ImageVector.vectorResource(id = R.drawable.ic_coffee), stringResource(R.string.donate_title), stringResource(R.string.donate_summary), onDonate, tint = WmwGreen)
         Spacer(Modifier.height(20.dp))
         Text(stringResource(R.string.privacy_line), color = WmwMuted, fontSize = 12.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
         Footer(onLegal)
@@ -679,6 +863,7 @@ private fun MainScreen(
 private fun PermissionsScreen(
     modifier: Modifier,
     snapshot: PermissionProbe.Snapshot,
+    ringerSyncEnabled: Boolean,
     onBack: () -> Unit,
     onRefresh: () -> Unit,
     onNotificationListener: () -> Unit,
@@ -691,6 +876,16 @@ private fun PermissionsScreen(
     onShareAdbGuideHtml: () -> Unit,
     onCheckWatch: () -> Unit,
 ) {
+    val context = LocalContext.current
+    var watchRefreshKey by remember { mutableIntStateOf(0) }
+    var watchStatus by remember { mutableStateOf<DndSyncStatus?>(null) }
+    var watchLoading by remember { mutableStateOf(true) }
+    LaunchedEffect(watchRefreshKey) {
+        watchLoading = true
+        watchStatus = withContext(Dispatchers.IO) { requestWatchDndSyncStatus(context) }
+        watchLoading = false
+    }
+
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
         PageHeader(stringResource(R.string.permissions_and_background), onBack)
         Surface(
@@ -735,7 +930,14 @@ private fun PermissionsScreen(
             }
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(14.dp))
+        Text(
+            stringResource(R.string.permissions_section_phone),
+            color = WmwMuted,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
+        )
         SettingsPanel {
             PermissionStatusRow(
                 icon = Icons.Default.Notifications,
@@ -801,8 +1003,28 @@ private fun PermissionsScreen(
             }
         }
 
+        Spacer(Modifier.height(16.dp))
+        Text(
+            stringResource(R.string.permissions_section_watch),
+            color = WmwMuted,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
+        )
+        WatchPermissionsPanel(
+            status = watchStatus,
+            loading = watchLoading,
+            ringerSyncEnabled = ringerSyncEnabled,
+        )
+
         Spacer(Modifier.height(12.dp))
-        Button(onClick = onRefresh, modifier = Modifier.fillMaxWidth()) {
+        Button(
+            onClick = {
+                onRefresh()
+                watchRefreshKey++
+            },
+            modifier = Modifier.fillMaxWidth(),
+        ) {
             Icon(Icons.Default.Refresh, null)
             Spacer(Modifier.width(8.dp))
             Text(stringResource(R.string.refresh))
@@ -843,6 +1065,80 @@ private fun Context.shareDndAdbGuideHtml() {
     }.onFailure {
         Toast.makeText(this, R.string.dnd_adb_guide_export_failed, Toast.LENGTH_SHORT).show()
         EventHistoryStore.add(this, "DND_SETUP", "HTML_EXPORT_FAILED", it.message ?: it.javaClass.simpleName)
+    }
+}
+
+@Composable
+private fun WatchPermissionsPanel(
+    status: DndSyncStatus?,
+    loading: Boolean,
+    ringerSyncEnabled: Boolean,
+) {
+    SettingsPanel {
+        when {
+            loading -> WatchPermInfoRow(stringResource(R.string.permissions_watch_checking))
+            status == null || !status.reachable ->
+                WatchPermInfoRow(stringResource(R.string.permissions_watch_unreachable))
+            else -> {
+                PermissionStatusRow(
+                    icon = Icons.Default.Notifications,
+                    title = stringResource(R.string.permission_watch_notification_listener),
+                    ok = status.watchNotificationListenerGranted,
+                    okText = stringResource(R.string.granted),
+                    badText = stringResource(R.string.not_granted),
+                    actionText = "",
+                    onAction = {},
+                )
+                DividerLine()
+                PermissionStatusRow(
+                    icon = ImageVector.vectorResource(id = R.drawable.ic_do_not_disturb_on),
+                    title = stringResource(R.string.permission_watch_dnd_policy),
+                    ok = status.watchDndPolicyAccessGranted,
+                    okText = stringResource(R.string.granted),
+                    badText = stringResource(R.string.not_granted),
+                    actionText = "",
+                    onAction = {},
+                )
+                DividerLine()
+                PermissionStatusRow(
+                    icon = Icons.Default.Notifications,
+                    title = stringResource(R.string.permission_watch_post_notifications),
+                    ok = status.watchPostNotificationsGranted,
+                    okText = stringResource(R.string.granted),
+                    badText = stringResource(R.string.not_granted),
+                    actionText = "",
+                    onAction = {},
+                )
+                if (!status.watchDndPolicyAccessGranted) {
+                    DividerLine()
+                    Text(
+                        stringResource(
+                            if (ringerSyncEnabled) {
+                                R.string.permissions_watch_dnd_missing_ringer
+                            } else {
+                                R.string.permissions_watch_dnd_missing
+                            },
+                        ),
+                        color = Color(0xFFFFB74D),
+                        fontSize = 12.sp,
+                        lineHeight = 17.sp,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun WatchPermInfoRow(text: String) {
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Default.Search, null, tint = WmwMuted)
+        Spacer(Modifier.width(12.dp))
+        Text(text, color = WmwMuted, fontSize = 13.sp, lineHeight = 18.sp)
     }
 }
 
@@ -1036,16 +1332,6 @@ private fun SoundModeDialog(
                         )
                     }
                 }
-                DividerLine()
-                SwitchDialogRow(stringResource(R.string.vibrate_on_wake), settings.vibrateOnWake) {
-                    onSettings(settings.copy(vibrateOnWake = it))
-                }
-                Text(
-                    stringResource(R.string.vibrate_on_wake_summary),
-                    color = WmwMuted,
-                    fontSize = 13.sp,
-                    lineHeight = 18.sp,
-                )
             }
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.done)) } },
@@ -1094,6 +1380,245 @@ private fun WristDialog(settings: PhoneSettings, onSettings: (PhoneSettings) -> 
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(stringResource(R.string.off_wrist_support_note), color = WmwMuted, fontSize = 13.sp)
+                Spacer(Modifier.height(12.dp))
+                SwitchDialogRow(stringResource(R.string.off_wrist_requires_lock), settings.offWristRequiresLock) {
+                    onSettings(settings.copy(offWristRequiresLock = it))
+                }
+                Text(stringResource(R.string.off_wrist_requires_lock_summary), color = WmwMuted, fontSize = 13.sp)
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.done)) } },
+        containerColor = WmwSurface,
+    )
+}
+
+@Composable
+private fun ringerScheduleSummary(settings: PhoneSettings): String {
+    val plans = settings.ringerSchedulePlans
+    val on = plans.count { it.enabled }
+    return when {
+        plans.isEmpty() -> stringResource(R.string.ringer_schedule_summary_empty)
+        on == 0 -> stringResource(R.string.ringer_schedule_summary_all_off, plans.size)
+        else -> stringResource(R.string.ringer_schedule_summary_on, on, plans.size)
+    }
+}
+
+@Composable
+private fun RingerSchedulesScreen(
+    modifier: Modifier,
+    plans: List<RingerSchedulePlan>,
+    onBack: () -> Unit,
+    onTogglePlan: (String, Boolean) -> Unit,
+    onEditPlan: (String) -> Unit,
+    onAddPlan: () -> Unit,
+) {
+    Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
+        PageHeader(stringResource(R.string.ringer_schedule), onBack)
+        Text(
+            stringResource(R.string.ringer_schedule_screen_note),
+            color = WmwMuted,
+            fontSize = 13.sp,
+            lineHeight = 18.sp,
+            modifier = Modifier.padding(bottom = 12.dp),
+        )
+        if (plans.isEmpty()) {
+            Text(
+                stringResource(R.string.ringer_schedule_empty_hint),
+                color = WmwMuted,
+                fontSize = 13.sp,
+                modifier = Modifier.padding(vertical = 20.dp),
+            )
+        } else {
+            SettingsPanel {
+                plans.forEachIndexed { index, plan ->
+                    if (index > 0) DividerLine()
+                    Row(
+                        Modifier.fillMaxWidth().clickable { onEditPlan(plan.id) }.padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                plan.name.ifBlank { stringResource(R.string.ringer_schedule_plan_default_name) },
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 15.sp,
+                            )
+                            Text(
+                                "${RingerScheduleController.hhmm(plan.startMinutes)} – ${RingerScheduleController.hhmm(plan.endMinutes)} · ${daysLabel(plan.days)}",
+                                color = WmwMuted,
+                                fontSize = 12.sp,
+                                lineHeight = 16.sp,
+                            )
+                        }
+                        Switch(checked = plan.enabled, onCheckedChange = { onTogglePlan(plan.id, it) })
+                    }
+                }
+            }
+        }
+        Spacer(Modifier.height(14.dp))
+        Button(onClick = onAddPlan, modifier = Modifier.fillMaxWidth()) {
+            Icon(Icons.Default.Add, null)
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.ringer_schedule_add))
+        }
+        Spacer(Modifier.height(20.dp))
+    }
+}
+
+@Composable
+private fun RingerSchedulePlanScreen(
+    modifier: Modifier,
+    original: RingerSchedulePlan?,
+    onBack: () -> Unit,
+    onSave: (RingerSchedulePlan) -> Unit,
+    onDelete: (() -> Unit)?,
+) {
+    var draft by remember(original?.id) { mutableStateOf(original ?: RingerSchedulePlan()) }
+    Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
+        PageHeader(
+            stringResource(if (original == null) R.string.ringer_schedule_new else R.string.ringer_schedule_edit_title),
+            onBack,
+        )
+        SettingsPanel {
+            Column(Modifier.padding(16.dp)) {
+                OutlinedTextField(
+                    value = draft.name,
+                    onValueChange = { draft = draft.copy(name = it.take(40)) },
+                    label = { Text(stringResource(R.string.ringer_schedule_plan_name)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                RingerScheduleTimeRow(
+                    label = stringResource(R.string.ringer_schedule_quiet_start),
+                    minutes = draft.startMinutes,
+                    enabled = true,
+                ) { draft = draft.copy(startMinutes = it) }
+                RingerScheduleTimeRow(
+                    label = stringResource(R.string.ringer_schedule_quiet_end),
+                    minutes = draft.endMinutes,
+                    enabled = true,
+                ) { draft = draft.copy(endMinutes = it) }
+                Spacer(Modifier.height(12.dp))
+                Text(stringResource(R.string.ringer_schedule_repeat), fontSize = 14.sp)
+                Spacer(Modifier.height(8.dp))
+                DayCircles(draft.days) { day, on -> draft = draft.withDay(day, on) }
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    stringResource(R.string.ringer_schedule_days_note),
+                    color = WmwMuted,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                )
+            }
+        }
+        Spacer(Modifier.height(14.dp))
+        Button(
+            onClick = { onSave(draft) },
+            enabled = draft.startMinutes != draft.endMinutes && draft.days != 0,
+            modifier = Modifier.fillMaxWidth(),
+        ) { Text(stringResource(R.string.ringer_schedule_save)) }
+        Spacer(Modifier.height(8.dp))
+        OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(R.string.ringer_schedule_exit))
+        }
+        if (onDelete != null) {
+            Spacer(Modifier.height(8.dp))
+            TextButton(onClick = onDelete, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.ringer_schedule_delete), color = Color(0xFFFFB4AB))
+            }
+        }
+        Spacer(Modifier.height(20.dp))
+    }
+}
+
+@Composable
+private fun DayCircles(days: Int, onToggle: (Int, Boolean) -> Unit) {
+    val labels = stringArrayResource(R.array.weekday_short)
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        for (day in 0..6) {
+            val on = (days shr day) and 1 == 1
+            Box(
+                Modifier
+                    .size(38.dp)
+                    .clip(RoundedCornerShape(19.dp))
+                    .background(if (on) WmwPurple else Color.White.copy(alpha = .08f))
+                    .clickable { onToggle(day, !on) },
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    labels.getOrElse(day) { "?" },
+                    color = if (on) Color.White else WmwMuted,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun daysLabel(days: Int): String {
+    val labels = stringArrayResource(R.array.weekday_short)
+    if (days and RingerSchedulePlan.ALL_DAYS == RingerSchedulePlan.ALL_DAYS) return stringResource(R.string.ringer_schedule_days_every)
+    if (days == 0b0011111) return stringResource(R.string.ringer_schedule_days_weekdays)
+    if (days == 0b1100000) return stringResource(R.string.ringer_schedule_days_weekend)
+    return (0..6).filter { (days shr it) and 1 == 1 }.joinToString(" ") { labels.getOrElse(it) { "?" } }
+        .ifBlank { stringResource(R.string.ringer_schedule_days_none) }
+}
+
+@Composable
+private fun RingerScheduleTimeRow(
+    label: String,
+    minutes: Int,
+    enabled: Boolean,
+    onPicked: (Int) -> Unit,
+) {
+    val context = LocalContext.current
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .alpha(if (enabled) 1f else .45f)
+            .clickable(enabled = enabled) {
+                android.app.TimePickerDialog(
+                    context,
+                    { _, hour, minute -> onPicked(hour * 60 + minute) },
+                    minutes / 60,
+                    minutes % 60,
+                    true,
+                ).show()
+            }
+            .padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(label, Modifier.weight(1f), fontSize = 14.sp)
+        Text(
+            RingerScheduleController.hhmm(minutes),
+            color = WmwBlue,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 15.sp,
+        )
+    }
+}
+
+@Composable
+private fun SilentNotificationsDialog(settings: PhoneSettings, onSettings: (PhoneSettings) -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.silent_notifications)) },
+        text = {
+            Column {
+                Text(stringResource(R.string.silent_notifications_intro), color = WmwMuted, fontSize = 13.sp, lineHeight = 18.sp)
+                Spacer(Modifier.height(12.dp))
+                SwitchDialogRow(stringResource(R.string.silent_wake_screen), settings.silentWakeScreen) {
+                    onSettings(settings.copy(silentWakeScreen = it))
+                }
+                Text(stringResource(R.string.silent_wake_screen_summary), color = WmwMuted, fontSize = 13.sp, lineHeight = 18.sp)
+                Spacer(Modifier.height(12.dp))
+                SwitchDialogRow(stringResource(R.string.silent_vibrate), settings.silentVibrate) {
+                    onSettings(settings.copy(silentVibrate = it))
+                }
+                Text(stringResource(R.string.silent_vibrate_summary), color = WmwMuted, fontSize = 13.sp, lineHeight = 18.sp)
+                Spacer(Modifier.height(12.dp))
+                Text(stringResource(R.string.silent_notifications_ohealth_note), color = WmwMuted, fontSize = 13.sp, lineHeight = 18.sp)
             }
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.done)) } },
@@ -1863,11 +2388,11 @@ private fun requestWatchDndSyncStatus(context: Context): DndSyncStatus {
     } catch (error: Exception) {
         false
     }
-    if (!hasConnectedNode) return DndSyncStatus(-1, -1)
+    if (!hasConnectedNode) return DndSyncStatus(-1, -1, reachable = false)
 
     requestWatchDndSyncStatusOnce(context, attempt = 1)?.let { return it }
     requestWatchDndSyncStatusOnce(context, attempt = 2)?.let { return it }
-    return DndSyncStatus(-1, -1)
+    return DndSyncStatus(-1, -1, reachable = false)
 }
 
 /** Returns the watch's answer, or null if no response arrived within the per-attempt timeout
@@ -1979,6 +2504,14 @@ private fun wristSummary(settings: PhoneSettings, supported: Boolean): String = 
     settings.skipWakeOffWrist && settings.skipSoundOffWrist -> stringResource(R.string.wrist_both_enabled)
     settings.skipWakeOffWrist -> stringResource(R.string.wrist_wake_only)
     settings.skipSoundOffWrist -> stringResource(R.string.wrist_sound_only)
+    else -> stringResource(R.string.disabled)
+}
+
+@Composable
+private fun silentNotificationsSummary(settings: PhoneSettings): String = when {
+    settings.silentWakeScreen && settings.silentVibrate -> stringResource(R.string.silent_both_enabled)
+    settings.silentWakeScreen -> stringResource(R.string.silent_wake_only)
+    settings.silentVibrate -> stringResource(R.string.silent_vibrate_only)
     else -> stringResource(R.string.disabled)
 }
 

@@ -74,6 +74,17 @@ class PhoneWearListenerService : WearableListenerService() {
                 val (result, detail) = PhoneDndSyncBridge.applyIncomingFromWatch(this, envelope)
                 sendAck(event.sourceNodeId, envelope.eventId, result, detail)
             }
+            Protocol.RINGER_SYNC -> {
+                // Two-way, unlike DND_SYNC: the watch is allowed to drive the phone's ringer
+                // mode. Echo protection lives in RingerSync (shouldSuppressEcho), not here.
+                if (!isTrustedNode(event.sourceNodeId)) {
+                    EventHistoryStore.add(this, "RINGER_SYNC", "REJECTED", "unexpected_source_node")
+                    return
+                }
+                val (result, detail) = com.h_ide4pda.wakemywatch.phone.ringer.RingerSyncBridge
+                    .applyIncomingFromWatch(this, envelope)
+                sendAck(event.sourceNodeId, envelope.eventId, result, detail)
+            }
             Protocol.DND_PERMISSION_STATUS -> {
                 if (!isTrustedNode(event.sourceNodeId)) {
                     EventHistoryStore.add(this, "DND_SETUP", "STATUS_REJECTED", "unexpected_source_node")
@@ -98,8 +109,22 @@ class PhoneWearListenerService : WearableListenerService() {
                 }
                 val value = envelope.payload.optInt("value", -1)
                 val currentInterruptionFilter = envelope.payload.optInt("currentInterruptionFilter", -1)
-                EventHistoryStore.add(this, "DND_SYNC_STATUS", "RESPONSE_RECEIVED", "value=$value filter=$currentInterruptionFilter")
-                PhoneDndSyncStatusTransfer.complete(envelope.eventId, value, currentInterruptionFilter)
+                val status = DndSyncStatus(
+                    value = value,
+                    currentInterruptionFilter = currentInterruptionFilter,
+                    reachable = true,
+                    watchNotificationListenerGranted = envelope.payload.optBoolean("watchNotificationListenerGranted", false),
+                    watchDndPolicyAccessGranted = envelope.payload.optBoolean("watchDndPolicyAccessGranted", false),
+                    watchPostNotificationsGranted = envelope.payload.optBoolean("watchPostNotificationsGranted", false),
+                    watchRingerMode = envelope.payload.optInt("watchRingerMode", -1),
+                )
+                EventHistoryStore.add(
+                    this,
+                    "DND_SYNC_STATUS",
+                    "RESPONSE_RECEIVED",
+                    "value=$value filter=$currentInterruptionFilter listener=${status.watchNotificationListenerGranted} dndPolicy=${status.watchDndPolicyAccessGranted} post=${status.watchPostNotificationsGranted}",
+                )
+                PhoneDndSyncStatusTransfer.complete(envelope.eventId, status)
             }
             Protocol.DND_ADB_GUIDE -> {
                 if (!isTrustedNode(event.sourceNodeId)) {

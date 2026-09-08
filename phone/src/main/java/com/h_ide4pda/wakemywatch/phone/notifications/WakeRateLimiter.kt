@@ -4,7 +4,7 @@ class WakeRateLimiter {
     data class Decision(
         val skip: Boolean,
         val reason: String = "new",
-        /** Forward, but tell the watch to leave the panel dark: too soon after the last wake. */
+        /** Forward, but tell the watch to leave the panel dark: too soon after the last screen wake. */
         val suppressScreenWake: Boolean = false,
     )
 
@@ -55,7 +55,7 @@ class WakeRateLimiter {
                     skip = true,
                     reason = "global_wake_cooldown source=${lastGlobalWakePackage.orEmpty()} remainingMs=${ALERT_COOLDOWN_MS - elapsed}",
                 )
-                // Past the buzz threshold but not the screen one: the wrist alert is worth
+                // Past the buzz/sound threshold but not the screen one: the wrist alert is worth
                 // repeating for every message, a second panel flash this soon adds nothing.
                 elapsed in 0 until SCREEN_WAKE_COOLDOWN_MS -> suppressScreenWake = true
             }
@@ -82,9 +82,9 @@ class WakeRateLimiter {
         const val SCREEN_WAKE_COOLDOWN_MS = 2_000L
 
         /**
-         * A wrist buzz costs almost nothing, so it only needs a floor that stops a burst of
-         * messages turning into continuous shaking — not the screen's full two seconds. Every
-         * message in a conversation gets its own buzz again.
+         * A wrist buzz / sound correction costs almost nothing, so it only needs a floor that
+         * stops a burst of messages turning into continuous shaking — not the screen's full two
+         * seconds. Every message in a conversation gets its own alert again.
          */
         const val ALERT_COOLDOWN_MS = 700L
         const val CROSS_APP_DUPLICATE_WINDOW_MS = 2_000L

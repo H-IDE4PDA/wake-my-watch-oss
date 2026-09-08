@@ -19,6 +19,9 @@ object Protocol {
     const val ALARM_CLOSE = "$PREFIX/alarm/close"
     const val ALARM_ACTION = "$PREFIX/alarm/action"
     const val DND_SYNC = "$PREFIX/dnd/sync"
+    // Sound profile (ringer mode) mirroring, phone -> watch. A separate concern from DND_SYNC:
+    // notifications still arrive, only their sound changes.
+    const val RINGER_SYNC = "$PREFIX/ringer/sync"
     const val DND_SETUP = "$PREFIX/dnd/setup"
     const val DND_PERMISSION_STATUS = "$PREFIX/dnd/permission_status"
     const val DND_ADB_GUIDE = "$PREFIX/dnd/adb_guide"

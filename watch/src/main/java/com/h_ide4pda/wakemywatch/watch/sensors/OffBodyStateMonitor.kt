@@ -1,11 +1,11 @@
 package com.h_ide4pda.wakemywatch.watch.sensors
 
-import android.app.KeyguardManager
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.app.KeyguardManager
 import com.h_ide4pda.wakemywatch.core.AppSettings
 import com.h_ide4pda.wakemywatch.core.EventHistoryStore
 import com.h_ide4pda.wakemywatch.core.SoundMode
@@ -32,6 +32,7 @@ object OffBodyStateMonitor : SensorEventListener {
     private var sensorManager: SensorManager? = null
     private var offBodySensor: Sensor? = null
 
+    // Held only to log sensor transitions from onSensorChanged, which gets no context of its own.
     @Volatile
     private var appContext: Context? = null
 
@@ -50,9 +51,9 @@ object OffBodyStateMonitor : SensorEventListener {
         val wakeProtectionNeeded = settings.screenWake && settings.skipWakeOffWrist
         // Vibration shares the off-wrist rule with sound, so it has to keep the sensor alive on
         // its own — otherwise a vibration-only setup would never learn the watch is off the wrist.
-        val alertProtectionNeeded = (settings.soundMode != SoundMode.NONE || settings.vibrateOnWake) &&
+        val alertProtectionNeeded = (settings.soundMode != SoundMode.NONE || settings.silentVibrate) &&
             settings.skipSoundOffWrist
-        // Paused app has nothing to wake/sound for, regardless of pauseKeepsAlarmAndDnd — the
+        // Paused app has nothing to wake/alert for, regardless of pauseKeepsAlarmAndDnd — the
         // sensor is unrelated to Alarm Bridge/DND Sync, so there is no exception here.
         val shouldRegister = sensor != null && !settings.appPaused && (wakeProtectionNeeded || alertProtectionNeeded)
 
@@ -77,38 +78,22 @@ object OffBodyStateMonitor : SensorEventListener {
     }
 
     /**
-     * The sensor reading alone is not enough to suppress anything.
+     * Off-wrist decision used by the wake path.
      *
-     * The listener service process is torn down between messages and rebuilt for each one, so
-     * every notification re-registers the sensor and decides immediately, before a real reading
-     * can arrive — and a background process the framework has flagged `has sensor access: false`
-     * is handed zeroes, which read as "off body". Wear OS locks the watch the moment it leaves
-     * the wrist, so an unlocked secure watch is being worn whatever our own reading claims.
-     *
-     * Confirmed 2026-08-13: the hardware reported on-body at 07:40:48 and never changed, yet an
-     * hour of notifications was suppressed as off-wrist while the watch was worn and unlocked.
-     *
-     * With no lock configured the keyguard says nothing useful, and the sensor stays the only
-     * signal there is.
+     * With [requiresLock] false this is exactly the previous behavior — the sensor reading alone.
+     * With it true, off-wrist also requires a locked keyguard: the listener service process can be
+     * torn down and rebuilt for every message, so the sensor re-registers and this can be evaluated
+     * before a real reading arrives, and a background process the framework denies sensor access to
+     * is handed zeroes — read as off-body. Wear OS locks the watch the moment it actually leaves the
+     * wrist, so an unlocked watch is being worn no matter what the sensor claims. With no lock
+     * configured, the keyguard says nothing useful and the sensor stays the only signal there is.
      */
-    fun isOffWrist(context: Context): Boolean {
+    fun isOffWrist(context: Context, requiresLock: Boolean): Boolean {
         if (!supported || isWorn != false) return false
+        if (!requiresLock) return true
         val keyguard = context.getSystemService(KeyguardManager::class.java) ?: return true
         if (!runCatching { keyguard.isDeviceSecure }.getOrDefault(false)) return true
         return runCatching { keyguard.isKeyguardLocked }.getOrDefault(true)
-    }
-
-    /** Inputs behind the decision, so the event log shows why a wake was or was not suppressed. */
-    fun decisionDetail(context: Context): String {
-        val keyguard = context.getSystemService(KeyguardManager::class.java)
-        val secure = runCatching { keyguard?.isDeviceSecure == true }.getOrDefault(false)
-        val locked = runCatching { keyguard?.isKeyguardLocked == true }.getOrDefault(false)
-        val sensor = when (isWorn) {
-            null -> "unknown"
-            true -> "worn"
-            false -> "off"
-        }
-        return "sensor=$sensor,secureLock=${secure.bit()},locked=${locked.bit()},registered=${isRegistered.bit()}"
     }
 
     override fun onSensorChanged(event: SensorEvent) {
@@ -116,21 +101,19 @@ object OffBodyStateMonitor : SensorEventListener {
         val worn = raw?.let { it >= 0.5f }
         val changed = worn != isWorn
         isWorn = worn
-        // Transitions were previously invisible: nothing about this sensor reached the event
-        // history, so a wrong reading could only be reconstructed from suppressed notifications.
+        // Diagnostic only — does not feed the off_wrist decision. Lets us see on our own hardware
+        // whether the sensor reports off-wrist while the watch is actually being worn.
         if (changed) {
             appContext?.let { context ->
                 EventHistoryStore.add(
                     context,
                     "OFF_BODY",
                     if (worn == true) "WORN" else "OFF_WRIST",
-                    "raw=$raw ${decisionDetail(context)}",
+                    "raw=$raw",
                 )
             }
         }
     }
-
-    private fun Boolean.bit(): Int = if (this) 1 else 0
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
 }
